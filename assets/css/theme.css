@@ -1,0 +1,225 @@
+/* Global Theme System for Pharmacy Management System */
+
+/* Light Theme (Default) */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --border-light: #d1d5db;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-lg: rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-tertiary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
+    --border-light: #4b5563;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --shadow-lg: rgba(0, 0, 0, 0.4);
+}
+
+/* Apply theme to body */
+body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Background colors */
+.bg-white {
+    background-color: var(--bg-primary) !important;
+}
+
+.bg-gray-50 {
+    background-color: var(--bg-secondary) !important;
+}
+
+.bg-gray-100 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Text colors */
+.text-gray-800,
+.text-gray-900 {
+    color: var(--text-primary) !important;
+}
+
+.text-gray-600,
+.text-gray-700 {
+    color: var(--text-secondary) !important;
+}
+
+.text-gray-500 {
+    color: var(--text-muted) !important;
+}
+
+/* Border colors */
+.border-gray-200,
+.border-gray-300 {
+    border-color: var(--border-color) !important;
+}
+
+/* Form elements */
+input,
+select,
+textarea {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-light) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background-color: var(--bg-tertiary) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Cards and containers */
+.shadow-md {
+    box-shadow: 0 4px 6px -1px var(--shadow), 0 2px 4px -1px var(--shadow) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px var(--shadow-lg), 0 4px 6px -2px var(--shadow) !important;
+}
+
+/* Navigation */
+nav {
+    background-color: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+nav .text-gray-700,
+nav .text-gray-800 {
+    color: var(--text-secondary) !important;
+}
+
+nav .hover\:text-green-600:hover {
+    color: #10b981 !important;
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+    background-color: var(--bg-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Buttons - preserve original colors but adjust for dark mode */
+[data-theme="dark"] .bg-green-500 {
+    background-color: #059669 !important;
+}
+
+[data-theme="dark"] .bg-blue-500 {
+    background-color: #0369a1 !important;
+}
+
+[data-theme="dark"] .bg-red-500 {
+    background-color: #dc2626 !important;
+}
+
+[data-theme="dark"] .bg-yellow-500 {
+    background-color: #d97706 !important;
+}
+
+[data-theme="dark"] .bg-purple-500 {
+    background-color: #7c3aed !important;
+}
+
+[data-theme="dark"] .bg-orange-500 {
+    background-color: #ea580c !important;
+}
+
+/* Hover states for buttons */
+[data-theme="dark"] .hover\:bg-green-600:hover {
+    background-color: #047857 !important;
+}
+
+[data-theme="dark"] .hover\:bg-blue-600:hover {
+    background-color: #0284c7 !important;
+}
+
+[data-theme="dark"] .hover\:bg-red-600:hover {
+    background-color: #b91c1c !important;
+}
+
+/* Stats cards */
+.border-l-4 {
+    border-left-width: 4px !important;
+}
+
+/* Ensure green colors remain visible */
+.text-green-600 {
+    color: #059669 !important;
+}
+
+.text-green-700 {
+    color: #047857 !important;
+}
+
+/* Tables */
+[data-theme="dark"] table {
+    background-color: var(--bg-primary) !important;
+}
+
+[data-theme="dark"] th {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] td {
+    border-color: var(--border-color) !important;
+}
+
+/* Smooth transitions */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Custom scrollbar for dark mode */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
