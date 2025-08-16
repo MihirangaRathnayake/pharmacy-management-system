@@ -58,6 +58,13 @@ if ($_POST) {
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
+            
+            <?php if (isset($_GET['logout']) && $_GET['logout'] == '1'): ?>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    You have been successfully logged out.
+                </div>
+            <?php endif; ?>
 
             <form method="POST" class="space-y-6">
                 <div>

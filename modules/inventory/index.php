@@ -81,6 +81,79 @@ $user = getCurrentUser();
     <?php echo getThemeCSS(); ?>
     <style>
         body { font-family: 'Inter', sans-serif; }
+        
+        /* Enhanced button animations */
+        .action-btn {
+            transition: all 0.2s ease-in-out;
+            transform: translateY(0);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Table row hover effect */
+        .table-row:hover {
+            background-color: #f8fafc;
+            transform: translateX(2px);
+            transition: all 0.2s ease-in-out;
+        }
+        
+        /* Status badge animations */
+        .status-badge {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Alert icons pulse animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .alert-icon {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Modal animations */
+        .modal-enter {
+            animation: modalEnter 0.3s ease-out;
+        }
+        
+        @keyframes modalEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Toast animations */
+        .toast-enter {
+            animation: toastEnter 0.3s ease-out;
+        }
+        
+        @keyframes toastEnter {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
     </style>
     <?php renderThemeScript(); ?>
 </head>
@@ -153,7 +226,7 @@ $user = getCurrentUser();
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <?php foreach ($medicines as $medicine): ?>
-                            <tr class="hover:bg-gray-50">
+                            <tr class="table-row">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div>
                                         <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($medicine['name']); ?></div>
@@ -167,7 +240,7 @@ $user = getCurrentUser();
                                     <div class="flex items-center">
                                         <span class="text-sm font-medium text-gray-900"><?php echo $medicine['stock_quantity']; ?></span>
                                         <?php if ($medicine['alert_status'] === 'low'): ?>
-                                            <i class="fas fa-exclamation-triangle text-red-500 ml-2" title="Low Stock"></i>
+                                            <i class="fas fa-exclamation-triangle text-red-500 ml-2 alert-icon" title="Low Stock"></i>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -177,28 +250,39 @@ $user = getCurrentUser();
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-sm text-gray-900"><?php echo date('d/m/Y', strtotime($medicine['expiry_date'])); ?></span>
                                     <?php if ($medicine['alert_status'] === 'expiring'): ?>
-                                        <i class="fas fa-clock text-yellow-500 ml-2" title="Expiring Soon"></i>
+                                        <i class="fas fa-clock text-yellow-500 ml-2 alert-icon" title="Expiring Soon"></i>
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-badge
                                         <?php echo $medicine['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
                                         <?php echo ucfirst($medicine['status']); ?>
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
+                                    <div class="flex space-x-1">
+                                        <!-- View Button -->
                                         <a href="view_medicine.php?id=<?php echo $medicine['id']; ?>" 
-                                           class="text-blue-600 hover:text-blue-900" title="View">
-                                            <i class="fas fa-eye"></i>
+                                           class="action-btn inline-flex items-center px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium rounded-md" 
+                                           title="View Details">
+                                            <i class="fas fa-eye mr-1"></i>
+                                            View
                                         </a>
+                                        
+                                        <!-- Edit Button -->
                                         <a href="edit_medicine.php?id=<?php echo $medicine['id']; ?>" 
-                                           class="text-green-600 hover:text-green-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
+                                           class="action-btn inline-flex items-center px-2 py-1 bg-green-100 hover:bg-green-200 text-green-700 text-xs font-medium rounded-md" 
+                                           title="Edit Medicine">
+                                            <i class="fas fa-edit mr-1"></i>
+                                            Edit
                                         </a>
-                                        <button onclick="deleteMedicine(<?php echo $medicine['id']; ?>)" 
-                                                class="text-red-600 hover:text-red-900" title="Delete">
-                                            <i class="fas fa-trash"></i>
+                                        
+                                        <!-- Delete Button -->
+                                        <button onclick="deleteMedicine(<?php echo $medicine['id']; ?>, '<?php echo htmlspecialchars($medicine['name'], ENT_QUOTES); ?>')" 
+                                                class="action-btn inline-flex items-center px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium rounded-md" 
+                                                title="Delete Medicine">
+                                            <i class="fas fa-trash mr-1"></i>
+                                            Delete
                                         </button>
                                     </div>
                                 </td>
@@ -250,26 +334,150 @@ $user = getCurrentUser();
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 modal-enter">
+            <div class="flex items-center mb-4">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-gray-900">Delete Medicine</h3>
+                </div>
+            </div>
+            <div class="mb-4">
+                <p class="text-sm text-gray-500">
+                    Are you sure you want to delete "<span id="medicineName" class="font-medium"></span>"? 
+                    This action cannot be undone.
+                </p>
+                <p class="text-xs text-gray-400 mt-2">
+                    Note: If this medicine has sales history, it will be marked as discontinued instead of being deleted.
+                </p>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeDeleteModal()" 
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200">
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()" 
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200">
+                    <i class="fas fa-trash mr-1"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Toast -->
+    <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm toast-enter">
+            <div class="flex items-center">
+                <div id="toastIcon" class="flex-shrink-0"></div>
+                <div class="ml-3">
+                    <p id="toastMessage" class="text-sm font-medium"></p>
+                </div>
+                <button onclick="hideToast()" class="ml-4 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function deleteMedicine(id) {
-            if (confirm('Are you sure you want to delete this medicine?')) {
-                fetch('delete_medicine.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ id: id })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                });
-            }
+        let currentMedicineId = null;
+
+        function deleteMedicine(id, name) {
+            currentMedicineId = id;
+            document.getElementById('medicineName').textContent = name;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
         }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+            currentMedicineId = null;
+        }
+
+        function confirmDelete() {
+            if (!currentMedicineId) return;
+
+            // Show loading state
+            const deleteBtn = document.querySelector('#deleteModal button[onclick="confirmDelete()"]');
+            const originalText = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Deleting...';
+            deleteBtn.disabled = true;
+
+            fetch('delete_medicine.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: currentMedicineId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                closeDeleteModal();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    // Reload page after short delay to show toast
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showToast('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                closeDeleteModal();
+                showToast('Network error occurred', 'error');
+            })
+            .finally(() => {
+                // Reset button state
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+            });
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // Set icon and colors based on type
+            if (type === 'success') {
+                toastIcon.innerHTML = '<i class="fas fa-check-circle text-green-600 text-lg"></i>';
+                toastMessage.className = 'text-sm font-medium text-green-800';
+            } else {
+                toastIcon.innerHTML = '<i class="fas fa-exclamation-circle text-red-600 text-lg"></i>';
+                toastMessage.className = 'text-sm font-medium text-red-800';
+            }
+
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+
+            // Auto hide after 5 seconds
+            setTimeout(hideToast, 5000);
+        }
+
+        function hideToast() {
+            document.getElementById('toast').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
     </script>
 </body>
 </html>

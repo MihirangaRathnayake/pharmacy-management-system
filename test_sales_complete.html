@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Sales Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Complete Sales System Test</h1>
+
+        <!-- Test Results -->
+        <div id="testResults" class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            <div id="testOutput" class="space-y-2"></div>
+            <button onclick="runAllTests()" class="bg-blue-600 text-white px-4 py-2 rounded mt-4">
+                Run All Tests
+            </button>
+        </div>
+
+        <!-- Sales Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Medicine Search -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Medicine Search</h2>
+
+                <div class="mb-4">
+                    <div class="flex space-x-2">
+                        <input type="text" id="medicineSearch" placeholder="Search medicine by name or barcode..."
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <button type="button" onclick="searchMedicine()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="medicineResults"
+                        class="mt-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md hidden"></div>
+                </div>
+
+                <!-- Cart -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-3">Cart Items</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Medicine
+                                    </th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Price
+                                    </th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total
+                                    </th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartItems" class="bg-white divide-y divide-gray-200">
+                                <tr id="emptyCart">
+                                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">No items in cart</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Sale Summary</h2>
+
+                <div class="space-y-3 mb-6">
+                    <div class="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">Rs 0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Discount:</span>
+                        <input type="number" id="discountAmount" value="0" min="0" step="0.01"
+                            class="w-20 px-2 py-1 border rounded text-sm" onchange="updateTotals()">
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Tax (18%):</span>
+                        <span id="taxAmount">Rs 0.00</span>
+                    </div>
+                    <hr>
+                    <div class="flex justify-between text-lg font-bold">
+                        <span>Total:</span>
+                        <span id="totalAmount" class="text-green-600">Rs 0.00</span>
+                    </div>
+                </div>
+
+                <button onclick="testAddToCart()" class="w-full bg-green-600 text-white py-2 rounded mb-2">
+                    Test Add Item
+                </button>
+                <button onclick="clearCart()" class="w-full bg-red-600 text-white py-2 rounded">
+                    Clear Cart
+                </button>
+            </div>
+        </div>
+
+        <!-- Debug Console -->
+        <div class="bg-gray-900 text-green-400 p-4 rounded-lg mt-6 font-mono text-sm">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-white">Debug Console</h3>
+                <button onclick="clearConsole()" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Clear</button>
+            </div>
+            <div id="console" class="h-40 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+
+        // Console logging
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: 'text-green-400',
+                error: 'text-red-400',
+                warning: 'text-yellow-400',
+                success: 'text-blue-400'
+            };
+            console.innerHTML += `<div class="${colors[type]}">[${timestamp}] ${message}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = '';
+        }
+
+        // Test functions
+        function addTestResult(test, result, details = '') {
+            const output = document.getElementById('testOutput');
+            const icon = result ? '✅' : '❌';
+            const color = result ? 'text-green-600' : 'text-red-600';
+            output.innerHTML += `<div class="${color}">${icon} ${test} ${details}</div>`;
+        }
+
+        async function runAllTests() {
+            document.getElementById('testOutput').innerHTML = '';
+            log('Starting comprehensive tests...', 'info');
+
+            // Test 1: Check if functions exist
+            addTestResult('searchMedicine function exists', typeof searchMedicine === 'function');
+            addTestResult('addToCart function exists', typeof addToCart === 'function');
+            addTestResult('updateTotals function exists', typeof updateTotals === 'function');
+
+            // Test 2: Test API endpoint
+            try {
+                const response = await fetch('api/search_medicines.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: 'para' })
+                });
+
+                addTestResult('API endpoint accessible', response.ok, `(Status: ${response.status})`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addTestResult('API returns valid JSON', !!data);
+                    addTestResult('API search successful', data.success === true);
+                    addTestResult('API returns medicines', data.medicines && data.medicines.length > 0,
+                        `(Found: ${data.medicines ? data.medicines.length : 0})`);
+
+                    if (data.medicines && data.medicines.length > 0) {
+                        log(`Found medicines: ${data.medicines.map(m => m.name).join(', ')}`, 'success');
+                    }
+                }
+            } catch (error) {
+                addTestResult('API test failed', false, error.message);
+                log(`API Error: ${error.message}`, 'error');
+            }
+
+            // Test 3: Test cart functionality
+            const testMedicine = {
+                id: 1,
+                name: 'Test Medicine',
+                price: 10.00,
+                stock: 50
+            };
+
+            try {
+                addToCart(testMedicine.id, testMedicine.name, testMedicine.price, testMedicine.stock);
+                addTestResult('Add to cart works', cart.length > 0);
+                addTestResult('Cart total calculation', cart[0].total === testMedicine.price);
+
+                clearCart();
+                addTestResult('Clear cart works', cart.length === 0);
+            } catch (error) {
+                addTestResult('Cart functionality failed', false, error.message);
+                log(`Cart Error: ${error.message}`, 'error');
+            }
+
+            log('All tests completed!', 'success');
+        }
+
+        // Search function
+        function searchMedicine() {
+            const query = document.getElementById('medicineSearch').value.trim();
+            const resultsDiv = document.getElementById('medicineResults');
+
+            log(`Searching for: "${query}"`, 'info');
+
+            if (query.length < 2) {
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="p-3 text-blue-500 text-center">Searching...</div>';
+            resultsDiv.classList.remove('hidden');
+
+            fetch('api/search_medicines.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query })
+            })
+                .then(response => {
+                    log(`Response status: ${response.status}`, 'info');
+                    return response.json();
+                })
+                .then(data => {
+                    log(`Search response: ${JSON.stringify(data)}`, 'info');
+
+                    if (data.success && data.medicines && data.medicines.length > 0) {
+                        resultsDiv.innerHTML = data.medicines.map(medicine => `
+                        <div class="p-3 hover:bg-gray-50 cursor-pointer border-b" onclick="addToCart(${medicine.id}, '${medicine.name.replace(/'/g, "\\'")}', ${medicine.selling_price}, ${medicine.stock_quantity})">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium text-gray-800">${medicine.name}</p>
+                                    <p class="text-sm text-gray-600">${medicine.generic_name || ''}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-medium text-green-600">Rs ${parseFloat(medicine.selling_price).toFixed(2)}</p>
+                                    <p class="text-xs text-gray-500">Stock: ${medicine.stock_quantity}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    } else {
+                        resultsDiv.innerHTML = '<div class="p-3 text-gray-500 text-center">No medicines found</div>';
+                    }
+                })
+                .catch(error => {
+                    log(`Search error: ${error.message}`, 'error');
+                    resultsDiv.innerHTML = '<div class="p-3 text-red-500 text-center">Error searching medicines</div>';
+                });
+        }
+
+        // Cart functions
+        function addToCart(medicineId, medicineName, price, stockQuantity) {
+            log(`Adding to cart: ${medicineName} (ID: ${medicineId}, Price: ${price})`, 'info');
+
+            const existingItem = cart.find(item => item.medicineId === medicineId);
+
+            if (existingItem) {
+                if (existingItem.quantity < stockQuantity) {
+                    existingItem.quantity++;
+                    existingItem.total = existingItem.quantity * existingItem.price;
+                } else {
+                    log('Stock limit reached', 'warning');
+                    return;
+                }
+            } else {
+                cart.push({
+                    medicineId: medicineId,
+                    name: medicineName,
+                    price: parseFloat(price),
+                    quantity: 1,
+                    total: parseFloat(price),
+                    stockQuantity: stockQuantity
+                });
+            }
+
+            updateCartDisplay();
+            updateTotals();
+
+            document.getElementById('medicineSearch').value = '';
+            document.getElementById('medicineResults').classList.add('hidden');
+
+            log(`Cart updated. Items: ${cart.length}`, 'success');
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const emptyCart = document.getElementById('emptyCart');
+
+            if (cart.length === 0) {
+                emptyCart.style.display = 'table-row';
+                return;
+            }
+
+            emptyCart.style.display = 'none';
+
+            cartItems.innerHTML = cart.map((item, index) => `
+                <tr>
+                    <td class="px-4 py-2">
+                        <div class="text-sm font-medium text-gray-900">${item.name}</div>
+                    </td>
+                    <td class="px-4 py-2 text-sm text-gray-900">Rs ${item.price.toFixed(2)}</td>
+                    <td class="px-4 py-2">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity(${index}, -1)" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-minus-circle"></i>
+                            </button>
+                            <span class="text-sm font-medium w-8 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity(${index}, 1)" class="text-green-600 hover:text-green-800">
+                                <i class="fas fa-plus-circle"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-900">Rs ${item.total.toFixed(2)}</td>
+                    <td class="px-4 py-2">
+                        <button onclick="removeFromCart(${index})" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateQuantity(index, change) {
+            const item = cart[index];
+            const newQuantity = item.quantity + change;
+
+            if (newQuantity <= 0) {
+                removeFromCart(index);
+                return;
+            }
+
+            if (newQuantity > item.stockQuantity) {
+                log('Cannot exceed stock quantity', 'warning');
+                return;
+            }
+
+            item.quantity = newQuantity;
+            item.total = item.quantity * item.price;
+
+            updateCartDisplay();
+            updateTotals();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartDisplay();
+            updateTotals();
+            log('Item removed from cart', 'info');
+        }
+
+        function updateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
+            const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+            const taxableAmount = subtotal - discountAmount;
+            const taxAmount = taxableAmount * 0.18;
+            const totalAmount = taxableAmount + taxAmount;
+
+            document.getElementById('subtotal').textContent = 'Rs ' + subtotal.toFixed(2);
+            document.getElementById('taxAmount').textContent = 'Rs ' + taxAmount.toFixed(2);
+            document.getElementById('totalAmount').textContent = 'Rs ' + totalAmount.toFixed(2);
+        }
+
+        function testAddToCart() {
+            addToCart(999, 'Test Medicine', 25.00, 100);
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartDisplay();
+            updateTotals();
+            log('Cart cleared', 'info');
+        }
+
+        // Auto-search on input
+        document.getElementById('medicineSearch').addEventListener('input', function () {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(searchMedicine, 300);
+        });
+
+        // Initialize
+        log('Sales test page loaded', 'success');
+        log('Ready for testing!', 'info');
+    </script>
+</body>
+
+</html>

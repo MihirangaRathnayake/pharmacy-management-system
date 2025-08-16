@@ -29,6 +29,22 @@ if ($user['role'] === 'customer') {
     <?php echo getThemeCSS(); ?>
     <style>
         body { font-family: 'Inter', sans-serif; }
+        
+        /* Modal animations */
+        .modal-enter {
+            animation: modalEnter 0.3s ease-out;
+        }
+        
+        @keyframes modalEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
     <?php renderThemeScript(); ?>
 </head>
@@ -38,8 +54,29 @@ if ($user['role'] === 'customer') {
     <div class="container mx-auto px-4 py-8">
         <!-- Dashboard Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
-            <p class="text-gray-600">Welcome back, <?php echo htmlspecialchars($user['name']); ?>!</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+                    <p class="text-gray-600">Welcome back, <?php echo htmlspecialchars($user['name']); ?>!</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Logged in as</p>
+                        <p class="font-medium text-gray-800"><?php echo htmlspecialchars($user['name']); ?></p>
+                        <p class="text-xs text-gray-500"><?php echo ucfirst($user['role']); ?></p>
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <a href="modules/settings/index.php" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition duration-200 flex items-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Settings
+                        </a>
+                        <button onclick="confirmLogout()" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg text-sm font-medium transition duration-200 flex items-center">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Quick Stats Cards -->
@@ -138,6 +175,86 @@ if ($user['role'] === 'customer') {
         </div>
     </div>
 
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 modal-enter">
+            <div class="flex items-center mb-4">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-sign-out-alt text-red-600 text-2xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-gray-900">Confirm Logout</h3>
+                </div>
+            </div>
+            <div class="mb-4">
+                <p class="text-sm text-gray-500">
+                    Are you sure you want to logout? You will need to login again to access the system.
+                </p>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeLogoutModal()" 
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors duration-200">
+                    Cancel
+                </button>
+                <button onclick="performLogout()" 
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200">
+                    <i class="fas fa-sign-out-alt mr-1"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/dashboard.js"></script>
+    
+    <script>
+        function confirmLogout() {
+            document.getElementById('logoutModal').classList.remove('hidden');
+            document.getElementById('logoutModal').classList.add('flex');
+        }
+        
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.add('hidden');
+            document.getElementById('logoutModal').classList.remove('flex');
+        }
+        
+        function performLogout() {
+            // Show loading state
+            const logoutBtn = document.querySelector('#logoutModal button[onclick="performLogout()"]');
+            const originalText = logoutBtn.innerHTML;
+            logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Logging out...';
+            logoutBtn.disabled = true;
+            
+            // Add a small delay for better UX
+            setTimeout(() => {
+                window.location.href = 'auth/logout.php';
+            }, 500);
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('logoutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLogoutModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLogoutModal();
+            }
+        });
+        
+        // Add logout confirmation to navbar logout link as well
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLogoutLink = document.querySelector('a[href="/auth/logout.php"]');
+            if (navLogoutLink) {
+                navLogoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    confirmLogout();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

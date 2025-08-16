@@ -19,7 +19,7 @@ try {
     $stmt = $pdo->prepare("
         SELECT id, name, generic_name, selling_price, stock_quantity, barcode
         FROM medicines 
-        WHERE (name LIKE :query OR generic_name LIKE :query OR barcode LIKE :query)
+        WHERE (name LIKE :query1 OR generic_name LIKE :query2 OR barcode LIKE :query3)
         AND status = 'active' 
         AND stock_quantity > 0
         ORDER BY name ASC
@@ -27,7 +27,11 @@ try {
     ");
     
     $searchQuery = "%$query%";
-    $stmt->execute(['query' => $searchQuery]);
+    $stmt->execute([
+        'query1' => $searchQuery,
+        'query2' => $searchQuery,
+        'query3' => $searchQuery
+    ]);
     $medicines = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
