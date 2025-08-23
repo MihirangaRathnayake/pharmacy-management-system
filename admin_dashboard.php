@@ -247,7 +247,7 @@ if ($user['role'] === 'customer') {
         
         // Add logout confirmation to navbar logout link as well
         document.addEventListener('DOMContentLoaded', function() {
-            const navLogoutLink = document.querySelector('a[href="/auth/logout.php"]');
+            const navLogoutLink = document.querySelector('a[href*="auth/logout.php"]');
             if (navLogoutLink) {
                 navLogoutLink.addEventListener('click', function(e) {
                     e.preventDefault();

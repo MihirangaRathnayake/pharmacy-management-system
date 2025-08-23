@@ -5,6 +5,31 @@
     box-sizing: border-box;
 }
 
+/* Font System - Inter & Amazon Ember */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Amazon Ember for Headings and Important Elements */
+h1, h2, h3, h4, h5, h6,
+.hero-title, .section-title, .feature-card h3,
+.product-name, .promo-content h3, .tip-card h3,
+.footer-logo, .modal-header h2,
+button, .btn, .nav-btn, .cart-btn, .add-to-cart-btn,
+.nav-logo, .brand-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Inter for Body Text and Forms */
+body, p, span, div, 
+input, textarea, select, label,
+.nav-link, .hero-subtitle, .feature-card p,
+.product-description, .promo-content p, .tip-card p,
+.footer-section p, .contact-info p,
+.modal-body, .form-group {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
 :root {
     --primary-color: #28a745;
     --primary-dark: #218838;
@@ -21,10 +46,12 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     color: var(--text-dark);
     background-color: var(--accent-color);
+    font-weight: 400;
+    letter-spacing: -0.01em;
 }
 
 .container {
@@ -68,6 +95,8 @@ body {
     font-weight: 700;
     color: var(--primary-color);
     text-decoration: none;
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif;
+    letter-spacing: -0.03em;
 }
 
 .nav-logo i {
@@ -85,6 +114,8 @@ body {
     font-weight: 500;
     transition: var(--transition);
     position: relative;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.005em;
 }
 
 .nav-link:hover,
@@ -156,6 +187,8 @@ body {
     transition: var(--transition);
     text-decoration: none;
     font-weight: 500;
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif;
+    letter-spacing: -0.01em;
 }
 
 .nav-btn:hover,
@@ -219,6 +252,8 @@ body {
     color: var(--text-dark);
     margin-bottom: 20px;
     line-height: 1.2;
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif;
+    letter-spacing: -0.03em;
 }
 
 .hero-subtitle {
@@ -226,6 +261,8 @@ body {
     color: var(--text-light);
     margin-bottom: 30px;
     line-height: 1.6;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
 }
 
 .hero-buttons {
@@ -260,6 +297,8 @@ body {
     text-decoration: none;
     text-align: center;
     justify-content: center;
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif;
+    letter-spacing: -0.01em;
 }
 
 .btn-primary {
@@ -300,6 +339,8 @@ body {
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 50px;
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif;
+    letter-spacing: -0.025em;
 }
 
 .features-grid {
@@ -340,11 +381,14 @@ body {
     font-weight: 600;
     margin-bottom: 15px;
     color: var(--text-dark);
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif;
+    letter-spacing: -0.015em;
 }
 
 .feature-card p {
     color: var(--text-light);
     line-height: 1.6;
+    font-family: 'Inter', sans-serif;
 }
 
 /* Product Carousel */

@@ -32,6 +32,10 @@
 body {
     background-color: var(--bg-secondary);
     color: var(--text-primary);
+    font-family: var(--font-primary);
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -185,6 +189,139 @@ nav .hover\:text-green-600:hover {
 
 [data-theme="dark"] td {
     border-color: var(--border-color) !important;
+}
+
+/* Font Integration - Complete System Override */
+
+/* Global Font Application */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Amazon Ember for Headings and Important Elements */
+h1, h2, h3, h4, h5, h6,
+.text-4xl, .text-5xl, .text-6xl, .text-3xl, .text-2xl, .text-xl, .text-lg,
+.font-bold, .font-semibold, .font-extrabold, .font-black,
+.heading, .title, .brand-title,
+button, .btn, .button, input[type="submit"], input[type="button"],
+.cta, .call-to-action,
+.nav-brand, .navbar-brand, .logo,
+.card-title, .panel-title, .widget-title,
+th, .table-header, .table-head,
+.stat-number, .metric, .counter,
+.alert-title, .notification-title,
+.footer-title,
+.modal-title, .modal-header h1, .modal-header h2, .modal-header h3,
+.dashboard-title, .page-title, .section-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+/* Specific Weight Adjustments for Amazon Ember */
+h1, .text-4xl, .text-5xl, .text-6xl {
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+}
+
+h2, .text-3xl {
+    font-weight: 600 !important;
+    letter-spacing: -0.025em !important;
+}
+
+h3, .text-2xl {
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+}
+
+h4, .text-xl {
+    font-weight: 500 !important;
+    letter-spacing: -0.015em !important;
+}
+
+button, .btn, .button {
+    font-weight: 500 !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* Inter for Body Text and Forms */
+body, p, span, div, 
+input, textarea, select, label,
+.form-control, .form-input, .form-label,
+nav a, .nav-link, .navbar-nav a,
+.dropdown-item, .menu-item,
+.breadcrumb, .pagination,
+.table td, .table-body,
+.card-text, .panel-body,
+.alert-text, .notification-text,
+small, .small, .text-sm, .text-xs {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Navigation Specific */
+.navbar-brand, .nav-brand, .brand-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+}
+
+nav, .navbar, .nav-link {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+}
+
+/* Stats and Metrics */
+.stat-number, .metric, .counter {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    font-feature-settings: 'tnum' !important;
+}
+
+/* Tables */
+th, .table-header {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+}
+
+td, .table-cell {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Cards and Panels */
+.card-title, .panel-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+}
+
+.card-text, .panel-body {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Alerts and Notifications */
+.alert-title, .notification-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+}
+
+.alert-text, .notification-text {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Footer */
+.footer-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+}
+
+footer p, footer a, footer span {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
 }
 
 /* Smooth transitions */

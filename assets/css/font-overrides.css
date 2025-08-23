@@ -1,0 +1,253 @@
+/* Font Override System - Inter & Amazon Ember */
+
+/* Global Font Application */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Amazon Ember for Headings and Important Elements */
+h1, h2, h3, h4, h5, h6,
+.text-4xl, .text-5xl, .text-6xl, .text-3xl, .text-2xl, .text-xl, .text-lg,
+.font-bold, .font-semibold, .font-extrabold, .font-black,
+.heading, .title, .brand-title,
+button, .btn, .button, input[type="submit"], input[type="button"],
+.cta, .call-to-action,
+.nav-brand, .navbar-brand, .logo,
+.card-title, .panel-title, .widget-title,
+th, .table-header, .table-head,
+.stat-number, .metric, .counter,
+.alert-title, .notification-title,
+.footer-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Inter for Body Text and Forms */
+body, p, span, div, 
+input, textarea, select, label,
+.form-control, .form-input, .form-label,
+nav a, .nav-link, .navbar-nav a,
+.dropdown-item, .menu-item,
+.breadcrumb, .pagination,
+.table td, .table-body,
+.card-text, .panel-body,
+.alert-text, .notification-text,
+small, .small, .text-sm, .text-xs {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Specific Weight Adjustments for Amazon Ember */
+h1, .text-4xl, .text-5xl, .text-6xl {
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+}
+
+h2, .text-3xl {
+    font-weight: 600 !important;
+    letter-spacing: -0.025em !important;
+}
+
+h3, .text-2xl {
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+}
+
+h4, .text-xl {
+    font-weight: 500 !important;
+    letter-spacing: -0.015em !important;
+}
+
+button, .btn, .button {
+    font-weight: 500 !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* Inter Optimizations */
+body {
+    font-weight: 400 !important;
+    line-height: 1.6 !important;
+    letter-spacing: -0.01em !important;
+}
+
+input, textarea, select {
+    font-weight: 400 !important;
+    letter-spacing: -0.005em !important;
+}
+
+label, .form-label {
+    font-weight: 500 !important;
+    letter-spacing: -0.005em !important;
+}
+
+/* Navigation Specific */
+.navbar-brand, .nav-brand, .brand-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+}
+
+nav a, .nav-link {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.005em !important;
+}
+
+/* Stats and Metrics */
+.stat-number, .metric, .counter {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    font-feature-settings: 'tnum' !important;
+}
+
+/* Tables */
+th, .table-header {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+}
+
+td, .table-cell {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Cards and Panels */
+.card-title, .panel-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+}
+
+.card-text, .panel-body {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Alerts and Notifications */
+.alert-title, .notification-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+}
+
+.alert-text, .notification-text {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Footer */
+.footer-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+}
+
+footer p, footer a, footer span {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    font-weight: 500 !important;
+    letter-spacing: -0.01em !important;
+}
+
+[data-theme="dark"] body {
+    font-weight: 400 !important;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+    }
+    
+    h1, .text-4xl, .text-5xl, .text-6xl {
+        letter-spacing: -0.02em !important;
+    }
+    
+    h2, .text-3xl {
+        letter-spacing: -0.015em !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    * {
+        font-family: 'Inter', serif !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', serif !important;
+    }
+}/* F
+ont Awesome Icon System Override */
+.fas, .far, .fab, .fal, .fad, .fa {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    display: inline-block !important;
+    speak: none !important;
+}
+
+.far {
+    font-weight: 400 !important;
+}
+
+.fab {
+    font-weight: 400 !important;
+    font-family: "Font Awesome 6 Brands" !important;
+}
+
+/* Ensure icons override any font system */
+i.fas, i.far, i.fab, i.fal, i.fad, i.fa,
+span.fas, span.far, span.fab, span.fal, span.fad, span.fa {
+    font-family: "Font Awesome 6 Free" !important;
+    font-style: normal !important;
+    font-weight: 900 !important;
+    text-transform: none !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Override any conflicting font declarations */
+* .fas, * .far, * .fab, * .fal, * .fad, * .fa {
+    font-family: "Font Awesome 6 Free" !important;
+}
+
+/* Specific common icons */
+.fa-home, .fa-user, .fa-cog, .fa-edit, .fa-save, .fa-times, 
+.fa-camera, .fa-key, .fa-chart-bar, .fa-sign-out-alt,
+.fa-chart-line, .fa-rupee-sign, .fa-shopping-bag, 
+.fa-cash-register, .fa-history, .fa-circle {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+
+/* Button icons */
+button .fas, button .far, button .fab,
+.btn .fas, .btn .far, .btn .fab,
+a .fas, a .far, a .fab {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    margin-right: 0.5rem;
+}
+
+/* Navigation icons */
+nav .fas, nav .far, nav .fab,
+.navbar .fas, .navbar .far, .navbar .fab {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+}

@@ -242,4 +242,27 @@ input:checked + .toggle-slider:before {
         width: 80px;
         height: 80px;
     }
+}/* Fo
+nt System Override for Settings Page */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Amazon Ember for Headings and Important Elements */
+h1, h2, h3, h4, h5, h6,
+.settings-title, .section-title, .card-title,
+.tab-title, .form-title,
+button, .btn, .button,
+.nav-brand, .brand-title {
+    font-family: 'Amazon Ember Display', 'Amazon Ember', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+}
+
+/* Inter for Body Text */
+body, p, span, div, 
+input, textarea, select, label,
+.settings-info, .form-text, .help-text {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
 }
