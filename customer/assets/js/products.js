@@ -1,433 +1,700 @@
-// Products page JavaScript functionality
+// Products page specific JavaScript
 
-let currentProducts = [];
-let currentPage = 1;
-let totalPages = 1;
-let currentFilters = {
-    search: '',
-    category: '',
-    sort: 'name',
-    prescription: ''
-};
-
-// Initialize products page
-document.addEventListener('DOMContentLoaded', function () {
-    initializeProductsPage();
-    setupProductFilters();
-    loadProducts();
-});
-
-// Initialize products page
-function initializeProductsPage() {
-    // Get URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search');
-    const category = urlParams.get('category');
-
-    if (searchQuery) {
-        currentFilters.search = searchQuery;
-        document.getElementById('headerSearch').value = searchQuery;
+class ProductsPage {
+    constructor() {
+        this.modal = document.getElementById('productModal');
+        this.modalBody = document.getElementById('modalBody');
+        this.init();
     }
 
-    if (category) {
-        currentFilters.category = category;
-        document.getElementById('categoryFilter').value = category;
+    init() {
+        this.setupEventListeners();
+        this.setupFilters();
     }
 
-    // Generate loading skeleton
-    generateLoadingSkeleton();
-}
-
-// Setup product filters
-function setupProductFilters() {
-    // Category filter
-    document.getElementById('categoryFilter').addEventListener('change', function () {
-        currentFilters.category = this.value;
-        currentPage = 1;
-        loadProducts();
-    });
-
-    // Sort filter
-    document.getElementById('sortFilter').addEventListener('change', function () {
-        currentFilters.sort = this.value;
-        currentPage = 1;
-        loadProducts();
-    });
-
-    // Prescription filter
-    document.getElementById('prescriptionFilter').addEventListener('change', function () {
-        currentFilters.prescription = this.value;
-        currentPage = 1;
-        loadProducts();
-    });
-
-    // Header search
-    const headerSearch = document.getElementById('headerSearch');
-    let searchTimeout;
-    headerSearch.addEventListener('input', function () {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            currentFilters.search = this.value;
-            currentPage = 1;
-            loadProducts();
-        }, 500);
-    });
-}
-
-// Load products
-function loadProducts() {
-    showLoadingSkeleton();
-
-    // Build query parameters
-    const params = new URLSearchParams({
-        q: currentFilters.search,
-        category: currentFilters.category,
-        sort: currentFilters.sort,
-        prescription: currentFilters.prescription,
-        page: currentPage,
-        limit: 12
-    });
-
-    // Remove empty parameters
-    for (let [key, value] of [...params]) {
-        if (!value) params.delete(key);
-    }
-
-    fetch(`/api/customer/search_products.php?${params}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                currentProducts = data.products;
-                displayProducts(data.products);
-                updateResultsCount(data.total);
-                updatePagination(data.total);
-            } else {
-                showNoProducts();
+    setupEventListeners() {
+        // View details buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-details') || e.target.closest('.view-details')) {
+                const btn = e.target.classList.contains('view-details') ? e.target : e.target.closest('.view-details');
+                const productId = btn.dataset.id;
+                this.showProductDetails(productId);
             }
-        })
-        .catch(error => {
-            console.error('Error loading products:', error);
-            showNoProducts();
-        })
-        .finally(() => {
-            hideLoadingSkeleton();
         });
-}
 
-// Display products
-function displayProducts(products) {
-    const productsGrid = document.getElementById('productsGrid');
-    const noProducts = document.getElementById('noProducts');
+        // Modal close events
+        if (this.modal) {
+            const closeBtn = this.modal.querySelector('.modal-close');
+            const overlay = this.modal.querySelector('.modal-overlay');
 
-    if (products.length === 0) {
-        showNoProducts();
-        return;
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => this.closeModal());
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', () => this.closeModal());
+            }
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.modal.classList.contains('active')) {
+                    this.closeModal();
+                }
+            });
+        }
+
+        // Filter form auto-submit
+        const filterSelects = document.querySelectorAll('.filter-select');
+        filterSelects.forEach(select => {
+            select.addEventListener('change', () => {
+                this.submitFilters();
+            });
+        });
+
+        // Search form enhancements
+        const searchForm = document.querySelector('.search-form');
+        if (searchForm) {
+            const searchInput = searchForm.querySelector('.search-input-large');
+            if (searchInput) {
+                // Add search suggestions (if implemented)
+                searchInput.addEventListener('input', (e) => {
+                    this.debounce(() => this.showSearchSuggestions(e.target.value), 300)();
+                });
+            }
+        }
     }
 
-    noProducts.style.display = 'none';
+    setupFilters() {
+        // URL parameter handling
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Highlight active filters
+        this.highlightActiveFilters(urlParams);
+        
+        // Auto-submit on filter change
+        this.setupAutoSubmit();
+    }
 
-    productsGrid.innerHTML = products.map(product => `
-        <div class="product-card" data-product-id="${product.id}">
-            <div class="product-image-container">
-                <img src="${product.image || 'assets/images/default-medicine.jpg'}" 
-                     alt="${product.name}" class="product-image"
-                     onerror="this.src='assets/images/default-medicine.jpg'">
-                
-                <div class="product-badges">
-                    ${product.prescription_required ?
-            '<span class="badge badge-prescription">Prescription Required</span>' :
-            '<span class="badge badge-otc">OTC</span>'
-        }
+    async showProductDetails(productId) {
+        try {
+            // Show loading state
+            this.showModal();
+            this.modalBody.innerHTML = `
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading product details...</p>
                 </div>
-                
-                <button class="favorite-btn" onclick="toggleFavorite(${product.id})" title="Add to favorites">
-                    <i class="far fa-heart"></i>
-                </button>
-            </div>
-            
-            <div class="product-info">
-                <h3 class="product-name">${product.name}</h3>
-                ${product.generic_name ? `<p class="product-generic">${product.generic_name}</p>` : ''}
-                ${product.description ? `<p class="product-description">${product.description}</p>` : ''}
-                
-                <div class="product-price-section">
-                    <span class="product-price">Rs ${parseFloat(product.selling_price).toFixed(2)}</span>
-                    <span class="product-stock">
-                        ${product.stock_quantity > 0 ?
-            `${product.stock_quantity} in stock` :
-            'Out of stock'
-        }
-                    </span>
+            `;
+
+            // Fetch product details
+            const response = await fetch(`../api/get_medicine.php?id=${productId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this.renderProductDetails(data.data);
+            } else {
+                throw new Error(data.message || 'Failed to load product details');
+            }
+        } catch (error) {
+            console.error('Error loading product details:', error);
+            this.modalBody.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Failed to load product details. Please try again.</p>
+                    <button class="btn btn-primary" onclick="productsPage.closeModal()">Close</button>
                 </div>
-                
-                <div class="product-actions">
-                    <button class="btn-add-cart" 
-                            onclick="quickAddToCart(this, ${product.id})"
-                            ${!product.in_stock ? 'disabled' : ''}>
-                        <i class="fas fa-cart-plus"></i>
-                        ${product.in_stock ? 'Add to Cart' : 'Out of Stock'}
-                    </button>
-                    <button class="btn-view-details" onclick="viewProductDetails(${product.id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Show no products message
-function showNoProducts() {
-    const productsGrid = document.getElementById('productsGrid');
-    const noProducts = document.getElementById('noProducts');
-    const pagination = document.getElementById('pagination');
-
-    productsGrid.innerHTML = '';
-    noProducts.style.display = 'block';
-    pagination.style.display = 'none';
-
-    updateResultsCount(0);
-}
-
-// Update results count
-function updateResultsCount(total) {
-    const resultsCount = document.getElementById('resultsCount');
-    if (total === 0) {
-        resultsCount.textContent = 'No products found';
-    } else if (total === 1) {
-        resultsCount.textContent = '1 product found';
-    } else {
-        resultsCount.textContent = `${total} products found`;
-    }
-}
-
-// Update pagination
-function updatePagination(total) {
-    const pagination = document.getElementById('pagination');
-    const itemsPerPage = 12;
-    totalPages = Math.ceil(total / itemsPerPage);
-
-    if (totalPages <= 1) {
-        pagination.style.display = 'none';
-        return;
-    }
-
-    pagination.style.display = 'flex';
-
-    let paginationHTML = '';
-
-    // Previous button
-    if (currentPage > 1) {
-        paginationHTML += `
-            <button class="pagination-btn" onclick="changePage(${currentPage - 1})">
-                <i class="fas fa-chevron-left"></i> Previous
-            </button>
-        `;
-    }
-
-    // Page numbers
-    const startPage = Math.max(1, currentPage - 2);
-    const endPage = Math.min(totalPages, currentPage + 2);
-
-    if (startPage > 1) {
-        paginationHTML += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
-        if (startPage > 2) {
-            paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+            `;
         }
     }
 
-    for (let i = startPage; i <= endPage; i++) {
-        paginationHTML += `
-            <button class="pagination-btn ${i === currentPage ? 'active' : ''}" 
-                    onclick="changePage(${i})">${i}</button>
-        `;
-    }
+    renderProductDetails(product) {
+        const expiryDate = product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : 'N/A';
+        const manufactureDate = product.manufacture_date ? new Date(product.manufacture_date).toLocaleDateString() : 'N/A';
 
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            paginationHTML += `<span class="pagination-ellipsis">...</span>`;
-        }
-        paginationHTML += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
-    }
-
-    // Next button
-    if (currentPage < totalPages) {
-        paginationHTML += `
-            <button class="pagination-btn" onclick="changePage(${currentPage + 1})">
-                Next <i class="fas fa-chevron-right"></i>
-            </button>
-        `;
-    }
-
-    pagination.innerHTML = paginationHTML;
-}
-
-// Change page
-function changePage(page) {
-    if (page >= 1 && page <= totalPages && page !== currentPage) {
-        currentPage = page;
-        loadProducts();
-
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-}
-
-// Clear filters
-function clearFilters() {
-    currentFilters = {
-        search: '',
-        category: '',
-        sort: 'name',
-        prescription: ''
-    };
-
-    // Reset form elements
-    document.getElementById('headerSearch').value = '';
-    document.getElementById('categoryFilter').value = '';
-    document.getElementById('sortFilter').value = 'name';
-    document.getElementById('prescriptionFilter').value = '';
-
-    currentPage = 1;
-    loadProducts();
-
-    // Update URL
-    window.history.pushState({}, '', window.location.pathname);
-}
-
-// View product details
-function viewProductDetails(productId) {
-    // For now, just show product info in a modal
-    // In a full implementation, you'd navigate to a product detail page
-    const product = currentProducts.find(p => p.id === productId);
-    if (product) {
-        showProductModal(product);
-    }
-}
-
-// Show product modal
-function showProductModal(product) {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h2>${product.name}</h2>
-                <button class="modal-close" onclick="this.closest('.modal').remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div style="display: grid; grid-template-columns: 200px 1fr; gap: 20px; margin-bottom: 20px;">
-                    <img src="${product.image || 'assets/images/default-medicine.jpg'}" 
-                         alt="${product.name}" style="width: 100%; border-radius: 8px;"
-                         onerror="this.src='assets/images/default-medicine.jpg'">
-                    <div>
-                        ${product.generic_name ? `<p><strong>Generic Name:</strong> ${product.generic_name}</p>` : ''}
-                        ${product.category_name ? `<p><strong>Category:</strong> ${product.category_name}</p>` : ''}
-                        ${product.dosage ? `<p><strong>Dosage:</strong> ${product.dosage}</p>` : ''}
-                        <p><strong>Price:</strong> Rs ${parseFloat(product.selling_price).toFixed(2)}</p>
-                        <p><strong>Stock:</strong> ${product.stock_quantity} ${product.unit || 'units'}</p>
-                        <p><strong>Type:</strong> ${product.prescription_required ? 'Prescription Required' : 'Over-the-Counter'}</p>
+        this.modalBody.innerHTML = `
+            <div class="product-details">
+                <div class="product-details-header">
+                    <div class="product-details-image">
+                        ${product.image ? 
+                            `<img src="../uploads/medicines/${product.image}" alt="${product.name}">` :
+                            `<div class="placeholder-large"><i class="fas fa-pills"></i></div>`
+                        }
+                        ${product.prescription_required ? 
+                            `<span class="prescription-badge-large">
+                                <i class="fas fa-prescription"></i> Prescription Required
+                            </span>` : ''
+                        }
+                    </div>
+                    <div class="product-details-info">
+                        <div class="product-category-large">${product.category_name || 'Uncategorized'}</div>
+                        <h2 class="product-name-large">${product.name}</h2>
+                        ${product.generic_name ? `<p class="product-generic-large">${product.generic_name}</p>` : ''}
+                        <div class="product-price-large">
+                            <span class="currency">Rs</span>
+                            <span class="amount">${parseFloat(product.selling_price).toFixed(2)}</span>
+                            <span class="unit">/ ${product.unit}</span>
+                        </div>
+                        <div class="stock-status">
+                            ${product.stock_quantity <= product.min_stock_level ?
+                                `<span class="stock-low">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Low Stock (${product.stock_quantity} remaining)
+                                </span>` :
+                                `<span class="stock-available">
+                                    <i class="fas fa-check-circle"></i>
+                                    In Stock (${product.stock_quantity} available)
+                                </span>`
+                            }
+                        </div>
                     </div>
                 </div>
-                ${product.description ? `<p><strong>Description:</strong> ${product.description}</p>` : ''}
-                <div style="margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="addToCart(${product.id}); this.closest('.modal').remove();"
-                            ${!product.in_stock ? 'disabled' : ''}>
+
+                <div class="product-details-body">
+                    <div class="details-section">
+                        <h3><i class="fas fa-info-circle"></i> Product Information</h3>
+                        <div class="details-grid">
+                            ${product.dosage ? `
+                                <div class="detail-item">
+                                    <label>Dosage:</label>
+                                    <span>${product.dosage}</span>
+                                </div>
+                            ` : ''}
+                            ${product.batch_number ? `
+                                <div class="detail-item">
+                                    <label>Batch Number:</label>
+                                    <span>${product.batch_number}</span>
+                                </div>
+                            ` : ''}
+                            <div class="detail-item">
+                                <label>Unit:</label>
+                                <span>${product.unit}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Expiry Date:</label>
+                                <span>${expiryDate}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Manufacture Date:</label>
+                                <span>${manufactureDate}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${product.description ? `
+                        <div class="details-section">
+                            <h3><i class="fas fa-file-text"></i> Description</h3>
+                            <p class="product-description">${product.description}</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="details-section">
+                        <h3><i class="fas fa-shield-alt"></i> Safety Information</h3>
+                        <div class="safety-info">
+                            ${product.prescription_required ? 
+                                `<div class="safety-item warning">
+                                    <i class="fas fa-prescription"></i>
+                                    <span>This medicine requires a valid prescription from a licensed doctor.</span>
+                                </div>` : 
+                                `<div class="safety-item success">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>This is an over-the-counter medicine.</span>
+                                </div>`
+                            }
+                            <div class="safety-item info">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Please read the label carefully before use.</span>
+                            </div>
+                            <div class="safety-item info">
+                                <i class="fas fa-thermometer-half"></i>
+                                <span>Store in a cool, dry place away from direct sunlight.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-details-footer">
+                    <div class="quantity-selector">
+                        <label>Quantity:</label>
+                        <div class="quantity-controls-large">
+                            <button class="qty-btn-large" onclick="this.nextElementSibling.stepDown()">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" class="quantity-input" value="1" min="1" max="${product.stock_quantity}">
+                            <button class="qty-btn-large" onclick="this.previousElementSibling.stepUp()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-success btn-large add-to-cart-modal" data-id="${product.id}">
                         <i class="fas fa-cart-plus"></i>
-                        ${product.in_stock ? 'Add to Cart' : 'Out of Stock'}
+                        Add to Cart
                     </button>
                 </div>
             </div>
-        </div>
-    `;
+        `;
 
-    document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
-
-    // Close modal when clicking outside
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal) {
-            modal.remove();
-            document.body.style.overflow = 'auto';
+        // Setup add to cart functionality for modal
+        const addToCartBtn = this.modalBody.querySelector('.add-to-cart-modal');
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', () => {
+                const quantity = this.modalBody.querySelector('.quantity-input').value;
+                this.addToCartWithQuantity(product.id, parseInt(quantity));
+            });
         }
-    });
-}
-
-// Generate loading skeleton
-function generateLoadingSkeleton() {
-    const skeleton = document.getElementById('loadingSkeleton');
-    const skeletonHTML = Array(8).fill().map(() => `
-        <div class="product-skeleton">
-            <div class="skeleton-image"></div>
-            <div class="skeleton-content">
-                <div class="skeleton-line"></div>
-                <div class="skeleton-line short"></div>
-                <div class="skeleton-line medium"></div>
-                <div class="skeleton-line short"></div>
-            </div>
-        </div>
-    `).join('');
-
-    skeleton.innerHTML = skeletonHTML;
-}
-
-// Show loading skeleton
-function showLoadingSkeleton() {
-    document.getElementById('loadingSkeleton').style.display = 'grid';
-    document.getElementById('productsGrid').style.display = 'none';
-    document.getElementById('noProducts').style.display = 'none';
-}
-
-// Hide loading skeleton
-function hideLoadingSkeleton() {
-    document.getElementById('loadingSkeleton').style.display = 'none';
-    document.getElementById('productsGrid').style.display = 'grid';
-}
-
-// Search functionality from header
-function performHeaderSearch() {
-    const query = document.getElementById('headerSearch').value;
-    currentFilters.search = query;
-    currentPage = 1;
-    loadProducts();
-}
-
-// Add event listener for Enter key in search
-document.getElementById('headerSearch').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        performHeaderSearch();
     }
-});
 
-// Filter by category (called from category links)
-function filterByCategory(category) {
-    currentFilters.category = category;
-    document.getElementById('categoryFilter').value = category;
-    currentPage = 1;
-    loadProducts();
+    async addToCartWithQuantity(productId, quantity) {
+        try {
+            // Add multiple items to cart
+            for (let i = 0; i < quantity; i++) {
+                await pharmacare.addToCart(productId);
+            }
+            
+            // Close modal after successful addition
+            setTimeout(() => {
+                this.closeModal();
+            }, 1000);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+        }
+    }
+
+    showModal() {
+        if (this.modal) {
+            this.modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    closeModal() {
+        if (this.modal) {
+            this.modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    submitFilters() {
+        const form = document.querySelector('.search-form');
+        if (form) {
+            form.submit();
+        }
+    }
+
+    highlightActiveFilters(urlParams) {
+        // Highlight active category
+        const categorySelect = document.querySelector('select[name="category"]');
+        if (categorySelect && urlParams.get('category')) {
+            categorySelect.style.background = 'var(--gradient-primary)';
+            categorySelect.style.color = 'white';
+        }
+
+        // Highlight active sort
+        const sortSelect = document.querySelector('select[name="sort"]');
+        if (sortSelect && urlParams.get('sort')) {
+            sortSelect.style.background = 'var(--gradient-primary)';
+            sortSelect.style.color = 'white';
+        }
+    }
+
+    setupAutoSubmit() {
+        // Auto-submit form when filters change
+        const filterInputs = document.querySelectorAll('.filter-select');
+        filterInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                // Add loading state
+                input.style.opacity = '0.6';
+                
+                // Submit form
+                setTimeout(() => {
+                    this.submitFilters();
+                }, 100);
+            });
+        });
+    }
+
+    async showSearchSuggestions(query) {
+        if (query.length < 2) return;
+
+        try {
+            const response = await fetch(`../api/search_suggestions.php?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            if (data.success && data.suggestions.length > 0) {
+                this.renderSearchSuggestions(data.suggestions);
+            }
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+        }
+    }
+
+    renderSearchSuggestions(suggestions) {
+        // Remove existing suggestions
+        const existingSuggestions = document.querySelector('.search-suggestions');
+        if (existingSuggestions) {
+            existingSuggestions.remove();
+        }
+
+        // Create suggestions dropdown
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.className = 'search-suggestions';
+        suggestionsContainer.innerHTML = suggestions.map(suggestion => `
+            <div class="suggestion-item" data-value="${suggestion.name}">
+                <i class="fas fa-pills"></i>
+                <span>${suggestion.name}</span>
+                ${suggestion.generic_name ? `<small>${suggestion.generic_name}</small>` : ''}
+            </div>
+        `).join('');
+
+        // Position and show suggestions
+        const searchWrapper = document.querySelector('.search-input-wrapper');
+        if (searchWrapper) {
+            searchWrapper.style.position = 'relative';
+            searchWrapper.appendChild(suggestionsContainer);
+
+            // Handle suggestion clicks
+            suggestionsContainer.addEventListener('click', (e) => {
+                const suggestionItem = e.target.closest('.suggestion-item');
+                if (suggestionItem) {
+                    const searchInput = document.querySelector('.search-input-large');
+                    if (searchInput) {
+                        searchInput.value = suggestionItem.dataset.value;
+                        this.submitFilters();
+                    }
+                }
+            });
+
+            // Remove suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    suggestionsContainer.remove();
+                }
+            }, { once: true });
+        }
+    }
+
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
 }
 
-// Quick filters
-function showOnlyPrescription() {
-    currentFilters.prescription = 'prescription';
-    document.getElementById('prescriptionFilter').value = 'prescription';
-    currentPage = 1;
-    loadProducts();
+// Initialize products page
+const productsPage = new ProductsPage();
+
+// Additional CSS for modal content
+const additionalStyles = `
+<style>
+.product-details {
+    font-family: var(--font-primary);
 }
 
-function showOnlyOTC() {
-    currentFilters.prescription = 'otc';
-    document.getElementById('prescriptionFilter').value = 'otc';
-    currentPage = 1;
-    loadProducts();
+.product-details-header {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
 }
 
-// Sort products
-function sortByPrice(order = 'low') {
-    currentFilters.sort = order === 'low' ? 'price_low' : 'price_high';
-    document.getElementById('sortFilter').value = currentFilters.sort;
-    currentPage = 1;
-    loadProducts();
+.product-details-image {
+    position: relative;
 }
+
+.product-details-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.placeholder-large {
+    width: 100%;
+    height: 200px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #ccc;
+}
+
+.prescription-badge-large {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--warning-orange);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.product-category-large {
+    font-size: 0.9rem;
+    color: var(--accent-purple);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.product-name-large {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-heading);
+}
+
+.product-generic-large {
+    font-size: 1rem;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.product-price-large {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.product-price-large .amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--success-green);
+}
+
+.product-price-large .unit {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.details-section {
+    margin-bottom: 2rem;
+}
+
+.details-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+    font-family: var(--font-heading);
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: #666;
+}
+
+.product-description {
+    line-height: 1.6;
+    color: #555;
+}
+
+.safety-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.safety-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.safety-item.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-orange);
+}
+
+.safety-item.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-green);
+}
+
+.safety-item.info {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-blue);
+}
+
+.product-details-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.quantity-selector label {
+    font-weight: 600;
+    color: #666;
+}
+
+.quantity-controls-large {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.qty-btn-large {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #f8f9fa;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.qty-btn-large:hover {
+    background: var(--primary-blue);
+    color: white;
+}
+
+.quantity-input {
+    width: 60px;
+    height: 40px;
+    border: none;
+    text-align: center;
+    font-weight: 600;
+    outline: none;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.loading-spinner i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary-blue);
+}
+
+.error-message {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.error-message i {
+    font-size: 3rem;
+    color: var(--error-red);
+    margin-bottom: 1rem;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    z-index: 100;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: background var(--transition-fast);
+}
+
+.suggestion-item:hover {
+    background: #f8f9fa;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item i {
+    color: var(--primary-blue);
+}
+
+.suggestion-item small {
+    color: #666;
+    font-style: italic;
+    margin-left: auto;
+}
+
+@media (max-width: 768px) {
+    .product-details-header {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .product-details-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .quantity-selector {
+        justify-content: center;
+    }
+    
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+`;
+
+// Inject additional styles
+document.head.insertAdjacentHTML('beforeend', additionalStyles);
