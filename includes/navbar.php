@@ -156,9 +156,12 @@ function loadNotifications() {
 }
 
 function toggleTheme() {
+    console.log('Theme toggle clicked');
     const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme');
+    const currentTheme = html.getAttribute('data-theme') || 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    console.log('Current theme:', currentTheme, 'New theme:', newTheme);
     
     // Apply theme immediately
     html.setAttribute('data-theme', newTheme);
@@ -173,8 +176,16 @@ function toggleTheme() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ theme: newTheme })
-    }).catch(error => {
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Theme saved successfully:', data);
+    })
+    .catch(error => {
         console.error('Error saving theme:', error);
+        // Revert theme on error
+        html.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
     });
     
     // Store in localStorage as backup
@@ -183,18 +194,32 @@ function toggleTheme() {
 
 function updateThemeIcon(theme) {
     const icon = document.getElementById('themeIcon');
-    if (theme === 'dark') {
-        icon.className = 'fas fa-sun text-xl';
-        icon.title = 'Switch to Light Mode';
+    if (icon) {
+        if (theme === 'dark') {
+            icon.className = 'fas fa-sun text-xl';
+            icon.parentElement.title = 'Switch to Light Mode';
+        } else {
+            icon.className = 'fas fa-moon text-xl';
+            icon.parentElement.title = 'Switch to Dark Mode';
+        }
+        console.log('Theme icon updated to:', theme);
     } else {
-        icon.className = 'fas fa-moon text-xl';
-        icon.title = 'Switch to Dark Mode';
+        console.error('Theme icon element not found');
     }
 }
 
 // Initialize theme icon on page load
 document.addEventListener('DOMContentLoaded', function() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    console.log('Initializing theme icon with theme:', currentTheme);
     updateThemeIcon(currentTheme);
+    
+    // Also check if the theme button exists
+    const themeButton = document.querySelector('button[onclick="toggleTheme()"]');
+    if (themeButton) {
+        console.log('Theme toggle button found');
+    } else {
+        console.error('Theme toggle button not found');
+    }
 });
 </script>
