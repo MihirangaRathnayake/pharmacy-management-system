@@ -1,0 +1,159 @@
+/* Admin Dashboard FontAwesome Icon Fix */
+/* This file ensures icons are visible immediately in admin dashboard */
+
+/* Import FontAwesome from multiple sources */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css');
+
+/* Force FontAwesome font loading with high priority */
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2'),
+         url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Font Awesome 6 Brands';
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2'),
+         url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Ensure all FontAwesome icons use the correct font */
+.fas, .fa-solid {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free', 'FontAwesome' !important;
+    font-weight: 900 !important;
+}
+
+.fab, .fa-brands {
+    font-family: 'Font Awesome 6 Brands', 'Font Awesome 5 Brands', 'FontAwesome' !important;
+    font-weight: 400 !important;
+}
+
+.far, .fa-regular {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free', 'FontAwesome' !important;
+    font-weight: 400 !important;
+}
+
+/* Base icon styling */
+[class*="fa-"] {
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Admin Dashboard Specific Icon Unicode Values */
+.fa-pills:before { content: "\f484"; }
+.fa-home:before { content: "\f015"; }
+.fa-boxes:before { content: "\f468"; }
+.fa-cash-register:before { content: "\f788"; }
+.fa-users:before { content: "\f0c0"; }
+.fa-chart-bar:before { content: "\f080"; }
+.fa-moon:before { content: "\f186"; }
+.fa-sun:before { content: "\f185"; }
+.fa-bell:before { content: "\f0f3"; }
+.fa-chevron-down:before { content: "\f078"; }
+.fa-user:before { content: "\f007"; }
+.fa-cog:before { content: "\f013"; }
+.fa-sign-out-alt:before { content: "\f2f5"; }
+.fa-bars:before { content: "\f0c9"; }
+.fa-rupee-sign:before { content: "\f156"; }
+.fa-exclamation-triangle:before { content: "\f071"; }
+.fa-clock:before { content: "\f017"; }
+.fa-plus-circle:before { content: "\f055"; }
+.fa-shopping-cart:before { content: "\f07a"; }
+.fa-upload:before { content: "\f093"; }
+.fa-user-plus:before { content: "\f234"; }
+.fa-chart-line:before { content: "\f201"; }
+.fa-download:before { content: "\f019"; }
+.fa-sync-alt:before { content: "\f2f1"; }
+.fa-arrow-up:before { content: "\f062"; }
+.fa-arrow-left:before { content: "\f060"; }
+.fa-search:before { content: "\f002"; }
+.fa-shield-alt:before { content: "\f3ed"; }
+.fa-save:before { content: "\f0c7"; }
+.fa-key:before { content: "\f084"; }
+.fa-adjust:before { content: "\f042"; }
+.fa-check-circle:before { content: "\f058"; }
+.fa-exclamation-circle:before { content: "\f06a"; }
+
+/* Fallback for when FontAwesome completely fails */
+.no-fontawesome .fa-pills:before { content: "💊" !important; }
+.no-fontawesome .fa-home:before { content: "🏠" !important; }
+.no-fontawesome .fa-boxes:before { content: "📦" !important; }
+.no-fontawesome .fa-cash-register:before { content: "💰" !important; }
+.no-fontawesome .fa-users:before { content: "👥" !important; }
+.no-fontawesome .fa-chart-bar:before { content: "📊" !important; }
+.no-fontawesome .fa-moon:before { content: "🌙" !important; }
+.no-fontawesome .fa-sun:before { content: "☀️" !important; }
+.no-fontawesome .fa-bell:before { content: "🔔" !important; }
+.no-fontawesome .fa-chevron-down:before { content: "▼" !important; }
+.no-fontawesome .fa-user:before { content: "👤" !important; }
+.no-fontawesome .fa-cog:before { content: "⚙️" !important; }
+.no-fontawesome .fa-sign-out-alt:before { content: "🚪" !important; }
+.no-fontawesome .fa-bars:before { content: "☰" !important; }
+.no-fontawesome .fa-rupee-sign:before { content: "₹" !important; }
+.no-fontawesome .fa-exclamation-triangle:before { content: "⚠️" !important; }
+.no-fontawesome .fa-clock:before { content: "🕐" !important; }
+.no-fontawesome .fa-plus-circle:before { content: "⊕" !important; }
+.no-fontawesome .fa-shopping-cart:before { content: "🛒" !important; }
+.no-fontawesome .fa-upload:before { content: "⬆️" !important; }
+.no-fontawesome .fa-user-plus:before { content: "👤+" !important; }
+.no-fontawesome .fa-chart-line:before { content: "📈" !important; }
+.no-fontawesome .fa-download:before { content: "⬇️" !important; }
+.no-fontawesome .fa-sync-alt:before { content: "🔄" !important; }
+.no-fontawesome .fa-arrow-up:before { content: "↑" !important; }
+.no-fontawesome .fa-arrow-left:before { content: "←" !important; }
+.no-fontawesome .fa-search:before { content: "🔍" !important; }
+.no-fontawesome .fa-shield-alt:before { content: "🛡️" !important; }
+.no-fontawesome .fa-save:before { content: "💾" !important; }
+.no-fontawesome .fa-key:before { content: "🔑" !important; }
+.no-fontawesome .fa-adjust:before { content: "🔆" !important; }
+.no-fontawesome .fa-check-circle:before { content: "✅" !important; }
+.no-fontawesome .fa-exclamation-circle:before { content: "⚠️" !important; }
+
+.no-fontawesome [class*="fa-"] {
+    font-family: Arial, sans-serif !important;
+    font-weight: normal !important;
+}
+
+/* Ensure icons are visible in Tailwind context */
+[class*="fa-"] {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'Font Awesome 5 Pro', 'FontAwesome' !important;
+}
+
+/* Fix for specific admin dashboard icon sizes */
+.text-2xl [class*="fa-"] {
+    font-size: 1.5rem !important;
+}
+
+.text-xl [class*="fa-"] {
+    font-size: 1.25rem !important;
+}
+
+/* Ensure proper spacing in navigation */
+nav [class*="fa-"] {
+    margin-right: 0.5rem;
+}
+
+/* Fix for button icons */
+button [class*="fa-"] {
+    margin-right: 0.5rem;
+}
+
+/* Fix for card icons */
+.bg-green-100 [class*="fa-"],
+.bg-blue-100 [class*="fa-"],
+.bg-yellow-100 [class*="fa-"],
+.bg-purple-100 [class*="fa-"] {
+    font-size: 1.25rem !important;
+}

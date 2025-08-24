@@ -1,0 +1,129 @@
+/* Immediate FontAwesome Icon Fix */
+/* This file ensures icons are visible immediately */
+
+/* Import FontAwesome from multiple sources */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css');
+
+/* Force FontAwesome font loading with high priority */
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2'),
+         url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Font Awesome 6 Brands';
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2'),
+         url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Ensure all FontAwesome icons use the correct font */
+.fas, .fa-solid {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free', 'FontAwesome' !important;
+    font-weight: 900 !important;
+}
+
+.fab, .fa-brands {
+    font-family: 'Font Awesome 6 Brands', 'Font Awesome 5 Brands', 'FontAwesome' !important;
+    font-weight: 400 !important;
+}
+
+.far, .fa-regular {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free', 'FontAwesome' !important;
+    font-weight: 400 !important;
+}
+
+/* Base icon styling */
+[class*="fa-"] {
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Specific icon fixes for common icons */
+.fa-plus-circle:before { content: "\f055"; }
+.fa-home:before { content: "\f015"; }
+.fa-pills:before { content: "\f484"; }
+.fa-prescription:before { content: "\f5b1"; }
+.fa-phone:before { content: "\f095"; }
+.fa-search:before { content: "\f002"; }
+.fa-shopping-cart:before { content: "\f07a"; }
+.fa-user:before { content: "\f007"; }
+.fa-sign-in-alt:before { content: "\f2f6"; }
+.fa-user-plus:before { content: "\f234"; }
+.fa-heartbeat:before { content: "\f21e"; }
+.fa-shield-alt:before { content: "\f3ed"; }
+.fa-truck:before { content: "\f0d1"; }
+.fa-band-aid:before { content: "\f462"; }
+.fa-syringe:before { content: "\f48e"; }
+.fa-leaf:before { content: "\f06c"; }
+.fa-thermometer-half:before { content: "\f2c9"; }
+.fa-cart-plus:before { content: "\f217"; }
+.fa-eye:before { content: "\f06e"; }
+.fa-arrow-right:before { content: "\f061"; }
+.fa-shipping-fast:before { content: "\f48b"; }
+.fa-certificate:before { content: "\f0a3"; }
+.fa-user-md:before { content: "\f0f0"; }
+.fa-lock:before { content: "\f023"; }
+.fa-times:before { content: "\f00d"; }
+.fa-credit-card:before { content: "\f09d"; }
+.fa-envelope:before { content: "\f0e0"; }
+.fa-map-marker-alt:before { content: "\f3c5"; }
+.fa-clock:before { content: "\f017"; }
+
+/* Brand icons */
+.fa-facebook-f:before { content: "\f39e"; }
+.fa-twitter:before { content: "\f099"; }
+.fa-instagram:before { content: "\f16d"; }
+.fa-linkedin-in:before { content: "\f0e1"; }
+
+/* Fallback for when FontAwesome completely fails */
+.no-fontawesome .fa-plus-circle:before { content: "⊕" !important; }
+.no-fontawesome .fa-home:before { content: "🏠" !important; }
+.no-fontawesome .fa-pills:before { content: "💊" !important; }
+.no-fontawesome .fa-prescription:before { content: "📋" !important; }
+.no-fontawesome .fa-phone:before { content: "📞" !important; }
+.no-fontawesome .fa-search:before { content: "🔍" !important; }
+.no-fontawesome .fa-shopping-cart:before { content: "🛒" !important; }
+.no-fontawesome .fa-user:before { content: "👤" !important; }
+.no-fontawesome .fa-sign-in-alt:before { content: "🔑" !important; }
+.no-fontawesome .fa-user-plus:before { content: "👥" !important; }
+.no-fontawesome .fa-heartbeat:before { content: "💓" !important; }
+.no-fontawesome .fa-shield-alt:before { content: "🛡️" !important; }
+.no-fontawesome .fa-truck:before { content: "🚚" !important; }
+.no-fontawesome .fa-band-aid:before { content: "🩹" !important; }
+.no-fontawesome .fa-syringe:before { content: "💉" !important; }
+.no-fontawesome .fa-leaf:before { content: "🍃" !important; }
+.no-fontawesome .fa-thermometer-half:before { content: "🌡️" !important; }
+.no-fontawesome .fa-cart-plus:before { content: "🛒+" !important; }
+.no-fontawesome .fa-eye:before { content: "👁️" !important; }
+.no-fontawesome .fa-arrow-right:before { content: "→" !important; }
+.no-fontawesome .fa-shipping-fast:before { content: "🚀" !important; }
+.no-fontawesome .fa-certificate:before { content: "🏆" !important; }
+.no-fontawesome .fa-user-md:before { content: "👨‍⚕️" !important; }
+.no-fontawesome .fa-lock:before { content: "🔒" !important; }
+.no-fontawesome .fa-times:before { content: "✕" !important; }
+.no-fontawesome .fa-credit-card:before { content: "💳" !important; }
+.no-fontawesome .fa-envelope:before { content: "✉️" !important; }
+.no-fontawesome .fa-map-marker-alt:before { content: "📍" !important; }
+.no-fontawesome .fa-clock:before { content: "🕐" !important; }
+.no-fontawesome .fa-facebook-f:before { content: "f" !important; }
+.no-fontawesome .fa-twitter:before { content: "t" !important; }
+.no-fontawesome .fa-instagram:before { content: "📷" !important; }
+.no-fontawesome .fa-linkedin-in:before { content: "in" !important; }
+
+.no-fontawesome [class*="fa-"] {
+    font-family: Arial, sans-serif !important;
+    font-weight: normal !important;
+}

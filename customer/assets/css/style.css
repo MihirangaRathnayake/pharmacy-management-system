@@ -1297,3 +1297,177 @@ Global Color Overrides for Consistency */
 .btn.loading {
     background: linear-gradient(135deg, var(--neutral-slate) 0%, var(--neutral-slate-light) 100%) !important;
 }
+
+/* FontAwesome Icon Fixes and Fallbacks */
+/* Force proper FontAwesome loading */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* Ensure FontAwesome icons are properly styled */
+[class*="fa-"] {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "Font Awesome 5 Pro", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Brand icons (fab) use different font weight */
+[class*="fab"] {
+    font-weight: 400 !important;
+}
+
+/* Regular icons (far) use different font weight */
+[class*="far"] {
+    font-weight: 400 !important;
+}
+
+/* Solid icons (fas) - default weight */
+[class*="fas"] {
+    font-weight: 900 !important;
+}
+
+/* FontAwesome Fallback - Icon replacements if FA doesn't load */
+.fa-plus-circle::before {
+    content: "⊕";
+}
+
+.fa-home::before {
+    content: "🏠";
+}
+
+.fa-pills::before {
+    content: "💊";
+}
+
+.fa-prescription::before {
+    content: "📋";
+}
+
+.fa-phone::before {
+    content: "📞";
+}
+
+.fa-search::before {
+    content: "🔍";
+}
+
+.fa-shopping-cart::before {
+    content: "🛒";
+}
+
+.fa-user::before {
+    content: "👤";
+}
+
+.fa-sign-in-alt::before {
+    content: "🔑";
+}
+
+.fa-user-plus::before {
+    content: "👥";
+}
+
+.fa-heartbeat::before {
+    content: "💓";
+}
+
+.fa-shield-alt::before {
+    content: "🛡️";
+}
+
+.fa-truck::before {
+    content: "🚚";
+}
+
+.fa-band-aid::before {
+    content: "🩹";
+}
+
+.fa-syringe::before {
+    content: "💉";
+}
+
+.fa-leaf::before {
+    content: "🍃";
+}
+
+.fa-thermometer-half::before {
+    content: "🌡️";
+}
+
+.fa-cart-plus::before {
+    content: "🛒+";
+}
+
+.fa-eye::before {
+    content: "👁️";
+}
+
+.fa-arrow-right::before {
+    content: "→";
+}
+
+.fa-shipping-fast::before {
+    content: "🚀";
+}
+
+.fa-certificate::before {
+    content: "🏆";
+}
+
+.fa-user-md::before {
+    content: "👨‍⚕️";
+}
+
+.fa-lock::before {
+    content: "🔒";
+}
+
+.fa-facebook-f::before {
+    content: "f";
+}
+
+.fa-twitter::before {
+    content: "t";
+}
+
+.fa-instagram::before {
+    content: "📷";
+}
+
+.fa-linkedin-in::before {
+    content: "in";
+}
+
+.fa-map-marker-alt::before {
+    content: "📍";
+}
+
+.fa-envelope::before {
+    content: "✉️";
+}
+
+.fa-clock::before {
+    content: "🕐";
+}
+
+.fa-times::before {
+    content: "✕";
+}
+
+.fa-credit-card::before {
+    content: "💳";
+}
+
+/* Alternative icon styling if FontAwesome fails completely */
+@supports not (font-family: "Font Awesome 6 Free") {
+    [class*="fa-"] {
+        font-family: Arial, sans-serif !important;
+        font-size: 1.2em !important;
+        font-weight: normal !important;
+    }
+}
