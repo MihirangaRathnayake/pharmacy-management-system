@@ -230,6 +230,24 @@ INSERT INTO medicines (name, generic_name, category_id, supplier_id, batch_numbe
 ('Cough Syrup', 'Dextromethorphan', 4, 2, 'CS001', 12.00, 20.00, 30, 10, '2025-09-30', FALSE),
 ('Metformin 500mg', 'Metformin HCl', 5, 3, 'MET001', 18.00, 30.00, 40, 15, '2025-11-30', TRUE);
 
+-- Password reset tokens table
+CREATE TABLE password_reset_tokens (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    verification_code VARCHAR(6),
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_token (token),
+    INDEX idx_email (email),
+    INDEX idx_code (verification_code),
+    INDEX idx_expires (expires_at)
+);
+
 -- User preferences table
 CREATE TABLE user_preferences (
     id INT PRIMARY KEY AUTO_INCREMENT,

@@ -80,20 +80,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 unit = ?, supplier_id = ?, description = ?, status = ?, updated_at = NOW()
             WHERE id = ?
         ");
-        
+
         $updateStmt->execute([
-            $name, $generic_name, $category_id, $dosage,
-            $barcode, $batch_number, $manufacture_date, $expiry_date,
-            $purchase_price, $selling_price, $stock_quantity, $min_stock_level,
-            $unit, $supplier_id, $description, $status, $id
+            $name,
+            $generic_name,
+            $category_id,
+            $dosage,
+            $barcode,
+            $batch_number,
+            $manufacture_date,
+            $expiry_date,
+            $purchase_price,
+            $selling_price,
+            $stock_quantity,
+            $min_stock_level,
+            $unit,
+            $supplier_id,
+            $description,
+            $status,
+            $id
         ]);
 
         $message = 'Medicine updated successfully!';
-        
+
         // Refresh medicine data
         $stmt->execute([$id]);
         $medicine = $stmt->fetch(PDO::FETCH_ASSOC);
-        
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -103,22 +115,16 @@ $user = getCurrentUser();
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?php echo getThemeClass(); ?>">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Medicine - <?php echo htmlspecialchars($medicine['name'] ?? 'Unknown Medicine'); ?></title>
+    <?php include '../../includes/head.php'; ?>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <?php echo getThemeCSS(); ?>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-    <?php renderThemeScript(); ?>
 </head>
-<body class="bg-gray-50">
+
+<body class="pc-shell">
     <?php include '../../includes/navbar.php'; ?>
-    
+
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
@@ -161,20 +167,20 @@ $user = getCurrentUser();
 
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Medicine Name *</label>
-                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($medicine['name'] ?? ''); ?>" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($medicine['name'] ?? ''); ?>"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
                 </div>
 
                 <div>
                     <label for="generic_name" class="block text-sm font-medium text-gray-700 mb-2">Generic Name *</label>
-                    <input type="text" id="generic_name" name="generic_name" value="<?php echo htmlspecialchars($medicine['generic_name'] ?? ''); ?>" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <input type="text" id="generic_name" name="generic_name" value="<?php echo htmlspecialchars($medicine['generic_name'] ?? ''); ?>"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
                 </div>
 
                 <div>
                     <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                    <select id="category_id" name="category_id" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <select id="category_id" name="category_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
                         <option value="">Select Category</option>
                         <?php foreach ($categories as $category): ?>
                             <option value="<?php echo $category['id']; ?>" <?php echo $medicine['category_id'] == $category['id'] ? 'selected' : ''; ?>>
@@ -186,21 +192,21 @@ $user = getCurrentUser();
 
                 <div>
                     <label for="dosage" class="block text-sm font-medium text-gray-700 mb-2">Dosage</label>
-                    <input type="text" id="dosage" name="dosage" value="<?php echo htmlspecialchars($medicine['dosage'] ?? ''); ?>" 
-                           placeholder="e.g., 500mg, 10ml, 1 tablet"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="text" id="dosage" name="dosage" value="<?php echo htmlspecialchars($medicine['dosage'] ?? ''); ?>"
+                        placeholder="e.g., 500mg, 10ml, 1 tablet"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
 
                 <div>
                     <label for="barcode" class="block text-sm font-medium text-gray-700 mb-2">Barcode</label>
-                    <input type="text" id="barcode" name="barcode" value="<?php echo htmlspecialchars($medicine['barcode'] ?? ''); ?>" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="text" id="barcode" name="barcode" value="<?php echo htmlspecialchars($medicine['barcode'] ?? ''); ?>"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
 
                 <div>
                     <label for="batch_number" class="block text-sm font-medium text-gray-700 mb-2">Batch Number</label>
-                    <input type="text" id="batch_number" name="batch_number" value="<?php echo htmlspecialchars($medicine['batch_number'] ?? ''); ?>" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="text" id="batch_number" name="batch_number" value="<?php echo htmlspecialchars($medicine['batch_number'] ?? ''); ?>"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
 
                 <!-- Dates -->
@@ -210,14 +216,14 @@ $user = getCurrentUser();
 
                 <div>
                     <label for="manufacture_date" class="block text-sm font-medium text-gray-700 mb-2">Manufacturing Date</label>
-                    <input type="date" id="manufacture_date" name="manufacture_date" value="<?php echo $medicine['manufacture_date'] ?? ''; ?>" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="date" id="manufacture_date" name="manufacture_date" value="<?php echo $medicine['manufacture_date'] ?? ''; ?>"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
 
                 <div>
                     <label for="expiry_date" class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
-                    <input type="date" id="expiry_date" name="expiry_date" value="<?php echo $medicine['expiry_date'] ?? ''; ?>" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <input type="date" id="expiry_date" name="expiry_date" value="<?php echo $medicine['expiry_date'] ?? ''; ?>"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
 
                 <!-- Pricing -->
@@ -227,16 +233,16 @@ $user = getCurrentUser();
 
                 <div>
                     <label for="purchase_price" class="block text-sm font-medium text-gray-700 mb-2">Purchase Price (Rs) *</label>
-                    <input type="number" id="purchase_price" name="purchase_price" value="<?php echo $medicine['purchase_price']; ?>" 
-                           step="0.01" min="0" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <input type="number" id="purchase_price" name="purchase_price" value="<?php echo $medicine['purchase_price']; ?>"
+                        step="0.01" min="0"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
                 </div>
 
                 <div>
                     <label for="selling_price" class="block text-sm font-medium text-gray-700 mb-2">Selling Price (Rs) *</label>
-                    <input type="number" id="selling_price" name="selling_price" value="<?php echo $medicine['selling_price']; ?>" 
-                           step="0.01" min="0" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <input type="number" id="selling_price" name="selling_price" value="<?php echo $medicine['selling_price']; ?>"
+                        step="0.01" min="0"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
                 </div>
 
                 <!-- Stock -->
@@ -246,16 +252,16 @@ $user = getCurrentUser();
 
                 <div>
                     <label for="stock_quantity" class="block text-sm font-medium text-gray-700 mb-2">Current Stock *</label>
-                    <input type="number" id="stock_quantity" name="stock_quantity" value="<?php echo $medicine['stock_quantity']; ?>" 
-                           min="0" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <input type="number" id="stock_quantity" name="stock_quantity" value="<?php echo $medicine['stock_quantity']; ?>"
+                        min="0"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
                 </div>
 
                 <div>
                     <label for="min_stock_level" class="block text-sm font-medium text-gray-700 mb-2">Minimum Stock Level *</label>
-                    <input type="number" id="min_stock_level" name="min_stock_level" value="<?php echo $medicine['min_stock_level']; ?>" 
-                           min="0" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <input type="number" id="min_stock_level" name="min_stock_level" value="<?php echo $medicine['min_stock_level']; ?>"
+                        min="0"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
                 </div>
 
                 <div>
@@ -275,8 +281,8 @@ $user = getCurrentUser();
 
                 <div>
                     <label for="supplier_id" class="block text-sm font-medium text-gray-700 mb-2">Supplier</label>
-                    <select id="supplier_id" name="supplier_id" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <select id="supplier_id" name="supplier_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="">Select Supplier</option>
                         <?php foreach ($suppliers as $supplier): ?>
                             <option value="<?php echo $supplier['id']; ?>" <?php echo $medicine['supplier_id'] == $supplier['id'] ? 'selected' : ''; ?>>
@@ -293,14 +299,14 @@ $user = getCurrentUser();
 
                 <div class="md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <textarea id="description" name="description" rows="3" 
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"><?php echo htmlspecialchars($medicine['description'] ?? ''); ?></textarea>
+                    <textarea id="description" name="description" rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"><?php echo htmlspecialchars($medicine['description'] ?? ''); ?></textarea>
                 </div>
 
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select id="status" name="status" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <select id="status" name="status"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="active" <?php echo $medicine['status'] === 'active' ? 'selected' : ''; ?>>Active</option>
                         <option value="inactive" <?php echo $medicine['status'] === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
                         <option value="discontinued" <?php echo $medicine['status'] === 'discontinued' ? 'selected' : ''; ?>>Discontinued</option>
@@ -310,12 +316,12 @@ $user = getCurrentUser();
 
             <!-- Submit Buttons -->
             <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
-                <a href="view_medicine.php?id=<?php echo $medicine['id']; ?>" 
-                   class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition duration-200">
+                <a href="view_medicine.php?id=<?php echo $medicine['id']; ?>"
+                    class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition duration-200">
                     Cancel
                 </a>
-                <button type="submit" 
-                        class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition duration-200">
+                <button type="submit"
+                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition duration-200">
                     <i class="fas fa-save mr-2"></i>Update Medicine
                 </button>
             </div>
@@ -327,7 +333,7 @@ $user = getCurrentUser();
         function updateProfitMargin() {
             const purchasePrice = parseFloat(document.getElementById('purchase_price').value) || 0;
             const sellingPrice = parseFloat(document.getElementById('selling_price').value) || 0;
-            
+
             if (purchasePrice > 0) {
                 const margin = ((sellingPrice - purchasePrice) / purchasePrice) * 100;
                 console.log('Profit Margin:', margin.toFixed(1) + '%');
@@ -337,8 +343,9 @@ $user = getCurrentUser();
         document.getElementById('purchase_price').addEventListener('input', updateProfitMargin);
         document.getElementById('selling_price').addEventListener('input', updateProfitMargin);
     </script>
-    
+
     <!-- Icon Fix Script -->
     <script src="../../assets/js/icon-fix.js"></script>
 </body>
+
 </html>

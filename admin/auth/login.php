@@ -304,7 +304,7 @@ if ($_POST) {
                                 class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
                             <label for="remember" class="text-slate-600 cursor-pointer select-none">Remember me</label>
                         </div>
-                        <a href="#" class="text-emerald-600 hover:text-emerald-700 font-medium transition-colors">Forgot password?</a>
+                        <a href="forgot_password.php" class="text-emerald-600 hover:text-emerald-700 font-medium transition-colors">Forgot password?</a>
                     </div>
 
                     <button type="submit"

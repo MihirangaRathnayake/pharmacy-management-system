@@ -1,160 +1,409 @@
 <?php
 require_once dirname(__DIR__) . '/bootstrap.php';
+require_once dirname(__DIR__) . '/includes/email_helper.php';
 
-$message = '';
-$messageType = '';
+// Redirect if already logged in
+if (isLoggedIn()) {
+    header('Location: ../index.php');
+    exit();
+}
+
+$error = '';
+$success = '';
 
 if ($_POST) {
     $email = trim($_POST['email']);
-    
+
     if (empty($email)) {
-        $message = 'Please enter your email address';
-        $messageType = 'error';
+        $error = 'Please enter your email address';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = 'Please enter a valid email address';
-        $messageType = 'error';
+        $error = 'Please enter a valid email address';
     } else {
         try {
-            // Check if email exists
-            $stmt = $pdo->prepare("SELECT id, name FROM users WHERE email = ? AND status = 'active'");
+            // Check if user exists
+            $stmt = $pdo->prepare("SELECT id, name, email FROM users WHERE email = ? AND status = 'active'");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($user) {
-                // In a real application, you would:
-                // 1. Generate a secure reset token
-                // 2. Store it in the database with expiration
-                // 3. Send an email with the reset link
-                
-                // For demo purposes, we'll just show a success message
-                $message = 'If an account with that email exists, we\'ve sent password reset instructions to your email address.';
-                $messageType = 'success';
-                
-                // Demo: Show reset instructions
-                $resetToken = bin2hex(random_bytes(32));
-                $message .= '<br><br><strong>Demo Mode:</strong> In a real application, you would receive an email. For now, you can use the password reset tool: <a href="../reset_admin.php" class="text-blue-600 underline">Reset Password Tool</a>';
+                // Generate reset token
+                $token = bin2hex(random_bytes(32));
+                $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+                // Create password_reset_tokens table if it doesn't exist
+                $pdo->exec("
+                    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+                        id INT PRIMARY KEY AUTO_INCREMENT,
+                        user_id INT NOT NULL,
+                        email VARCHAR(100) NOT NULL,
+                        token VARCHAR(255) NOT NULL,
+                        expires_at DATETIME NOT NULL,
+                        used BOOLEAN DEFAULT FALSE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                        INDEX idx_token (token),
+                        INDEX idx_email (email),
+                        INDEX idx_expires (expires_at)
+                    )
+                ");
+
+                // Store token in database
+                $stmt = $pdo->prepare("
+                    INSERT INTO password_reset_tokens (user_id, email, token, expires_at)
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([$user['id'], $email, $token, $expiresAt]);
+
+                // Generate reset link
+                $resetLink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") .
+                             "://" . $_SERVER['HTTP_HOST'] .
+                             dirname($_SERVER['REQUEST_URI']) . "/reset_password.php?token=" . $token;
+
+                // Send reset link via email
+                $emailSent = sendPasswordResetLink($email, $user['name'], $resetLink);
+
+                if ($emailSent) {
+                    $success = "A password reset link has been sent to your email address. Please check your inbox.";
+                } else {
+                    // Email sending failed - show error with development mode fallback
+                    $success = "Email delivery failed. <br><br>
+                                <strong>DEVELOPMENT MODE:</strong><br>
+                                <small>Click the link below to reset your password:</small><br>
+                                <a href='reset_password.php?token={$token}' class='inline-block mt-3 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium'>Reset Password →</a><br><br>
+                                <small>Note: In production, this link would be sent to your email.</small>";
+                }
+
             } else {
-                // Don't reveal if email exists or not for security
-                $message = 'If an account with that email exists, we\'ve sent password reset instructions to your email address.';
-                $messageType = 'success';
+                // Don't reveal if email exists or not (security best practice)
+                $success = "If an account with that email exists, a password reset link has been sent.";
             }
         } catch (Exception $e) {
-            $message = 'An error occurred. Please try again later.';
-            $messageType = 'error';
+            error_log("Forgot password error: " . $e->getMessage());
+            $error = "An error occurred. Please try again later.";
         }
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password - Pharmacy Management System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons - Multiple CDN fallbacks -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-    <!-- FontAwesome 5 fallback -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
-    <link rel="stylesheet" href="../assets/css/admin-icons-fix.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <?php include '../includes/head.php'; ?>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+    /* Minimal Light Background */
+    .auth-animated-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #f5f3ff 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 20s ease infinite;
+        z-index: -2;
+    }
+
+    @keyframes gradientShift {
+
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    /* Subtle Floating Particles */
+    .particle {
+        position: absolute;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    /* Clean Minimal Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(16, 185, 129, 0.08);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Minimal Logo */
+    .logo-animated {
+        animation: logoPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes logoPulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.02);
+        }
+    }
+
+    /* Subtle Input Animation */
+    .animated-input {
+        transition: all 0.2s ease;
+        border: 1.5px solid #e5e7eb;
+    }
+
+    .animated-input:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    /* Minimal Button */
+    .ripple-btn {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #10b981, #059669);
+        transition: all 0.3s ease;
+    }
+
+    .ripple-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .ripple-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+    }
+
+    .ripple-btn:active::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    /* Fade in animations */
+    .fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    .slide-up {
+        animation: slideUp 0.6s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
     </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full mx-4">
-        <!-- Logo -->
+
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style="background: #fafafa;">
+    <!-- Minimal Background -->
+    <div class="auth-animated-bg"></div>
+
+    <!-- Subtle Particles Container -->
+    <div id="particles-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+    </div>
+
+    <div class="max-w-md w-full mx-auto relative z-10 slide-up">
+        <!-- Minimal Logo -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center space-x-2 mb-4">
-                <i class="fas fa-pills text-green-600 text-4xl"></i>
-                <span class="text-3xl font-bold text-gray-800">PharmaCare</span>
+            <div class="inline-flex items-center space-x-3 mb-4 logo-animated">
+                <div
+                    class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-sm">
+                    <i class="fas fa-pills text-white text-2xl"></i>
+                </div>
+                <span class="text-3xl font-bold text-slate-800">PharmaCare</span>
             </div>
-            <p class="text-gray-600">Reset Your Password</p>
+            <p class="text-slate-500 text-sm">Pharmacy Management System</p>
         </div>
 
         <!-- Forgot Password Form -->
-        <div class="bg-white rounded-lg shadow-lg p-8">
-            <div class="text-center mb-6">
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                    <i class="fas fa-key text-green-600 text-xl"></i>
+        <div class="glass-card p-8 rounded-3xl">
+            <div class="text-center mb-8">
+                <div
+                    class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-key text-emerald-600 text-2xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800">Forgot Password?</h2>
-                <p class="text-gray-600 mt-2">Enter your email address and we'll send you instructions to reset your password.</p>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                    Forgot Password?
+                </h2>
+                <p class="text-slate-500 text-sm">Enter your email to reset your password</p>
             </div>
-            
-            <?php if ($message): ?>
-                <div class="<?php echo $messageType === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'; ?> px-4 py-3 rounded mb-4">
-                    <i class="fas <?php echo $messageType === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'; ?> mr-2"></i>
-                    <?php echo $message; ?>
-                </div>
+
+            <?php if ($error): ?>
+            <div
+                class="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3">
+                <i class="fas fa-exclamation-circle text-lg"></i>
+                <span class="text-sm"><?php echo htmlspecialchars($error); ?></span>
+            </div>
             <?php endif; ?>
 
-            <?php if (!$message || $messageType === 'error'): ?>
-            <form method="POST" class="space-y-6">
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-envelope mr-1"></i>Email Address
+            <?php if ($success): ?>
+            <div class="bg-emerald-50 border-l-4 border-emerald-400 text-emerald-700 px-4 py-3 rounded-xl mb-6">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-check-circle text-lg mt-0.5"></i>
+                    <div class="text-sm"><?php echo $success; ?></div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <form method="POST" class="space-y-5" id="forgotPasswordForm">
+                <div class="form-field">
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                        Email Address
                     </label>
-                    <input type="email" id="email" name="email" required
-                           value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                           placeholder="Enter your email address">
+                    <div class="relative">
+                        <input type="email" id="email" name="email" required
+                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                            class="w-full px-4 py-3 pl-12 animated-input rounded-xl focus:outline-none text-sm"
+                            placeholder="your@email.com">
+                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">We'll send you a link to reset your password</p>
                 </div>
 
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
+                <button type="submit"
+                    class="w-full ripple-btn text-white py-3.5 text-sm font-semibold rounded-xl shadow-sm hover:shadow-md transition-all">
                     <i class="fas fa-paper-plane mr-2"></i>
-                    Send Reset Instructions
+                    Send Reset Link
                 </button>
             </form>
-            <?php endif; ?>
 
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600">
-                    Remember your password? 
-                    <a href="login.php" class="text-green-600 hover:text-green-700 font-medium">Sign in</a>
-                </p>
+            <div class="mt-6 flex items-center justify-center gap-2 text-sm">
+                <span class="text-slate-600">Remember your password?</span>
+                <a href="login.php"
+                    class="text-emerald-600 hover:text-emerald-700 font-medium transition-colors inline-flex items-center gap-1">
+                    Sign In <i class="fas fa-arrow-right text-xs"></i>
+                </a>
             </div>
         </div>
 
-        <!-- Help Section -->
-        <div class="mt-6 bg-white rounded-lg shadow-md p-4">
-            <h3 class="text-sm font-medium text-gray-700 mb-2">Need Help?</h3>
-            <div class="text-xs text-gray-600 space-y-1">
-                <p><strong>Demo Users:</strong> Use the reset tool below to restore default passwords</p>
-                <div class="flex justify-center space-x-4 mt-3">
-                    <a href="../reset_admin.php" class="text-blue-600 hover:text-blue-700">
-                        <i class="fas fa-tools mr-1"></i>Reset Tool
-                    </a>
-                    <a href="../debug_login.php" class="text-purple-600 hover:text-purple-700">
-                        <i class="fas fa-bug mr-1"></i>Debug Login
-                    </a>
-                    <a href="../test_connection.php" class="text-orange-600 hover:text-orange-700">
-                        <i class="fas fa-check-circle mr-1"></i>Test System
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Access -->
+        <!-- Back Link -->
         <div class="mt-4 text-center">
-            <div class="flex justify-center space-x-4">
-                <a href="../index.php" class="text-gray-600 hover:text-gray-800 text-sm">
-                    <i class="fas fa-home mr-1"></i>Home
-                </a>
-                <a href="../customer/index.html" class="text-gray-600 hover:text-gray-800 text-sm">
-                    <i class="fas fa-shopping-cart mr-1"></i>Shop
-                </a>
-                <a href="register.php" class="text-gray-600 hover:text-gray-800 text-sm">
-                    <i class="fas fa-user-plus mr-1"></i>Register
-                </a>
-            </div>
+            <a href="../"
+                class="text-sm text-slate-500 hover:text-slate-700 transition-colors inline-flex items-center gap-2">
+                <i class="fas fa-arrow-left text-xs"></i> Back to Home
+            </a>
         </div>
     </div>
-    
-    <script src="../assets/js/admin-icons-fix.js"></script>
+
+    <script>
+    // Auto-focus email field
+    document.getElementById('email').focus();
+
+    // Create subtle floating particles
+    function createParticles() {
+        const container = document.getElementById('particles-container');
+        const particleCount = 25;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            const size = Math.random() * 60 + 20;
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+            const duration = Math.random() * 25 + 15;
+            const delay = Math.random() * 5;
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+
+            container.appendChild(particle);
+
+            // Animate with anime.js
+            if (typeof anime !== 'undefined') {
+                anime({
+                    targets: particle,
+                    translateY: [{
+                            value: -80,
+                            duration: duration * 500
+                        },
+                        {
+                            value: 80,
+                            duration: duration * 500
+                        }
+                    ],
+                    translateX: [{
+                            value: -40,
+                            duration: duration * 250
+                        },
+                        {
+                            value: 40,
+                            duration: duration * 500
+                        },
+                        {
+                            value: -40,
+                            duration: duration * 250
+                        }
+                    ],
+                    opacity: [{
+                            value: 0.5,
+                            duration: duration * 250
+                        },
+                        {
+                            value: 0.1,
+                            duration: duration * 500
+                        },
+                        {
+                            value: 0.5,
+                            duration: duration * 250
+                        }
+                    ],
+                    easing: 'easeInOutSine',
+                    loop: true,
+                    delay: delay * 1000
+                });
+            }
+        }
+    }
+
+    // Animate form on load
+    document.addEventListener('DOMContentLoaded', function() {
+        createParticles();
+
+        if (typeof anime !== 'undefined') {
+            // Subtle stagger animation for form field
+            anime({
+                targets: '.form-field',
+                translateY: [20, 0],
+                opacity: [0, 1],
+                delay: 400,
+                duration: 600,
+                easing: 'easeOutQuad'
+            });
+        }
+    });
+    </script>
 </body>
+
 </html>

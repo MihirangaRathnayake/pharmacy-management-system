@@ -43,22 +43,16 @@ $user = getCurrentUser();
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?php echo getThemeClass(); ?>">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Medicine - <?php echo htmlspecialchars($medicine['name'] ?? 'Unknown Medicine'); ?></title>
+    <?php include '../../includes/head.php'; ?>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <?php echo getThemeCSS(); ?>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-    <?php renderThemeScript(); ?>
 </head>
-<body class="bg-gray-50">
+
+<body class="pc-shell">
     <?php include '../../includes/navbar.php'; ?>
-    
+
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
@@ -83,42 +77,42 @@ $user = getCurrentUser();
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Medicine Information</h2>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Medicine Name</label>
                             <p class="text-gray-900 font-medium"><?php echo htmlspecialchars($medicine['name'] ?? 'Unknown Medicine'); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Generic Name</label>
                             <p class="text-gray-900"><?php echo htmlspecialchars($medicine['generic_name'] ?? 'N/A'); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                             <p class="text-gray-900"><?php echo htmlspecialchars($medicine['category_name'] ?? 'N/A'); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Barcode</label>
                             <p class="text-gray-900 font-mono"><?php echo htmlspecialchars($medicine['barcode'] ?? 'N/A'); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Batch Number</label>
                             <p class="text-gray-900"><?php echo htmlspecialchars($medicine['batch_number'] ?? 'N/A'); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
                             <p class="text-gray-900"><?php echo htmlspecialchars($medicine['dosage'] ?? 'N/A'); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Manufacturing Date</label>
                             <p class="text-gray-900">
-                                <?php 
+                                <?php
                                 if (!empty($medicine['manufacture_date'])) {
                                     echo date('d/m/Y', strtotime($medicine['manufacture_date']));
                                 } else {
@@ -127,11 +121,11 @@ $user = getCurrentUser();
                                 ?>
                             </p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
                             <p class="text-gray-900 <?php echo (!empty($medicine['expiry_date']) && strtotime($medicine['expiry_date']) <= strtotime('+30 days')) ? 'text-red-600 font-semibold' : ''; ?>">
-                                <?php 
+                                <?php
                                 if (!empty($medicine['expiry_date'])) {
                                     echo date('d/m/Y', strtotime($medicine['expiry_date']));
                                     if (strtotime($medicine['expiry_date']) <= strtotime('+30 days')) {
@@ -144,7 +138,7 @@ $user = getCurrentUser();
                             </p>
                         </div>
                     </div>
-                    
+
                     <?php if ($medicine['description']): ?>
                         <div class="mt-6">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -156,7 +150,7 @@ $user = getCurrentUser();
                 <!-- Recent Sales -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Sales</h2>
-                    
+
                     <?php if (empty($recentSales)): ?>
                         <p class="text-gray-500 text-center py-8">No recent sales found for this medicine.</p>
                     <?php else: ?>
@@ -193,7 +187,7 @@ $user = getCurrentUser();
                 <!-- Stock Information -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Stock Information</h3>
-                    
+
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Current Stock</label>
@@ -204,12 +198,12 @@ $user = getCurrentUser();
                                 <?php endif; ?>
                             </p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Stock Level</label>
                             <p class="text-gray-900"><?php echo $medicine['min_stock_level']; ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
                             <p class="text-gray-900"><?php echo htmlspecialchars($medicine['unit'] ?? 'N/A'); ?></p>
@@ -220,21 +214,21 @@ $user = getCurrentUser();
                 <!-- Pricing Information -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Pricing</h3>
-                    
+
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
                             <p class="text-lg font-semibold text-gray-900">Rs <?php echo number_format($medicine['purchase_price'], 2); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Selling Price</label>
                             <p class="text-lg font-semibold text-green-600">Rs <?php echo number_format($medicine['selling_price'], 2); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Profit Margin</label>
-                            <?php 
+                            <?php
                             $margin = (($medicine['selling_price'] - $medicine['purchase_price']) / $medicine['purchase_price']) * 100;
                             ?>
                             <p class="text-lg font-semibold text-blue-600"><?php echo number_format($margin, 1); ?>%</p>
@@ -246,20 +240,20 @@ $user = getCurrentUser();
                 <?php if ($medicine['supplier_name']): ?>
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Supplier</h3>
-                        
+
                         <div class="space-y-3">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
                                 <p class="text-gray-900"><?php echo htmlspecialchars($medicine['supplier_name'] ?? 'N/A'); ?></p>
                             </div>
-                            
+
                             <?php if ($medicine['contact_person']): ?>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
                                     <p class="text-gray-900"><?php echo htmlspecialchars($medicine['contact_person'] ?? 'N/A'); ?></p>
                                 </div>
                             <?php endif; ?>
-                            
+
                             <?php if ($medicine['phone']): ?>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
@@ -273,7 +267,7 @@ $user = getCurrentUser();
                 <!-- Status -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Status</h3>
-                    
+
                     <div class="space-y-3">
                         <div>
                             <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
@@ -281,12 +275,12 @@ $user = getCurrentUser();
                                 <?php echo ucfirst($medicine['status']); ?>
                             </span>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Created</label>
                             <p class="text-sm text-gray-600"><?php echo date('d/m/Y H:i', strtotime($medicine['created_at'])); ?></p>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Last Updated</label>
                             <p class="text-sm text-gray-600"><?php echo date('d/m/Y H:i', strtotime($medicine['updated_at'])); ?></p>
@@ -296,8 +290,9 @@ $user = getCurrentUser();
             </div>
         </div>
     </div>
-    
+
     <!-- Icon Fix Script -->
     <script src="../../assets/js/icon-fix.js"></script>
 </body>
+
 </html>

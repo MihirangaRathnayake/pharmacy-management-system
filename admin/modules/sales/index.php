@@ -39,13 +39,15 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Sales Management - Pharmacy Management System</title>
     <?php include '../../includes/head.php'; ?>
 </head>
-<body class="bg-gray-50">
+
+<body class="pc-shell">
     <?php include '../../includes/navbar.php'; ?>
-    
+
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
@@ -119,7 +121,7 @@ try {
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-800">Recent Sales</h2>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -173,33 +175,54 @@ try {
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            <?php 
-                                            switch($sale['payment_method']) {
-                                                case 'cash': echo 'bg-green-100 text-green-800'; break;
-                                                case 'card': echo 'bg-blue-100 text-blue-800'; break;
-                                                case 'upi': echo 'bg-purple-100 text-purple-800'; break;
-                                                default: echo 'bg-gray-100 text-gray-800';
+                                            <?php
+                                            switch ($sale['payment_method']) {
+                                                case 'cash':
+                                                    echo 'bg-green-100 text-green-800';
+                                                    break;
+                                                case 'card':
+                                                    echo 'bg-blue-100 text-blue-800';
+                                                    break;
+                                                case 'upi':
+                                                    echo 'bg-purple-100 text-purple-800';
+                                                    break;
+                                                default:
+                                                    echo 'bg-gray-100 text-gray-800';
                                             }
                                             ?>">
-                                            <i class="fas fa-<?php 
-                                                switch($sale['payment_method']) {
-                                                    case 'cash': echo 'money-bill'; break;
-                                                    case 'card': echo 'credit-card'; break;
-                                                    case 'upi': echo 'mobile-alt'; break;
-                                                    default: echo 'question';
-                                                }
-                                            ?> mr-1"></i>
+                                            <i class="fas fa-<?php
+                                                                switch ($sale['payment_method']) {
+                                                                    case 'cash':
+                                                                        echo 'money-bill';
+                                                                        break;
+                                                                    case 'card':
+                                                                        echo 'credit-card';
+                                                                        break;
+                                                                    case 'upi':
+                                                                        echo 'mobile-alt';
+                                                                        break;
+                                                                    default:
+                                                                        echo 'question';
+                                                                }
+                                                                ?> mr-1"></i>
                                             <?php echo ucfirst($sale['payment_method']); ?>
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            <?php 
-                                            switch($sale['status']) {
-                                                case 'completed': echo 'bg-green-100 text-green-800'; break;
-                                                case 'pending': echo 'bg-yellow-100 text-yellow-800'; break;
-                                                case 'cancelled': echo 'bg-red-100 text-red-800'; break;
-                                                default: echo 'bg-gray-100 text-gray-800';
+                                            <?php
+                                            switch ($sale['status']) {
+                                                case 'completed':
+                                                    echo 'bg-green-100 text-green-800';
+                                                    break;
+                                                case 'pending':
+                                                    echo 'bg-yellow-100 text-yellow-800';
+                                                    break;
+                                                case 'cancelled':
+                                                    echo 'bg-red-100 text-red-800';
+                                                    break;
+                                                default:
+                                                    echo 'bg-gray-100 text-gray-800';
                                             }
                                             ?>">
                                             <i class="fas fa-circle mr-1"></i>
@@ -211,20 +234,20 @@ try {
                                         <div class="text-xs text-gray-500"><?php echo date('g:i A', strtotime($sale['created_at'])); ?></div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <a href="invoice.php?id=<?php echo $sale['id']; ?>" 
-                                           class="text-green-600 hover:text-green-900 transition duration-200" 
-                                           title="View Invoice">
+                                        <a href="invoice.php?id=<?php echo $sale['id']; ?>"
+                                            class="text-green-600 hover:text-green-900 transition duration-200"
+                                            title="View Invoice">
                                             <i class="fas fa-file-invoice"></i>
                                         </a>
-                                        <a href="invoice.php?id=<?php echo $sale['id']; ?>&print=1" 
-                                           class="text-blue-600 hover:text-blue-900 transition duration-200" 
-                                           title="Print Invoice" target="_blank">
+                                        <a href="invoice.php?id=<?php echo $sale['id']; ?>&print=1"
+                                            class="text-blue-600 hover:text-blue-900 transition duration-200"
+                                            title="Print Invoice" target="_blank">
                                             <i class="fas fa-print"></i>
                                         </a>
                                         <?php if ($sale['status'] !== 'cancelled'): ?>
-                                            <button onclick="cancelSale(<?php echo $sale['id']; ?>)" 
-                                                    class="text-red-600 hover:text-red-900 transition duration-200" 
-                                                    title="Cancel Sale">
+                                            <button onclick="cancelSale(<?php echo $sale['id']; ?>)"
+                                                class="text-red-600 hover:text-red-900 transition duration-200"
+                                                title="Cancel Sale">
                                                 <i class="fas fa-times-circle"></i>
                                             </button>
                                         <?php endif; ?>
@@ -242,25 +265,28 @@ try {
         function cancelSale(saleId) {
             if (confirm('Are you sure you want to cancel this sale? This action cannot be undone.')) {
                 fetch('cancel_sale.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ sale_id: saleId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error cancelling sale: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Error cancelling sale: ' + error.message);
-                });
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            sale_id: saleId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Error cancelling sale: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error cancelling sale: ' + error.message);
+                    });
             }
         }
     </script>
 </body>
+
 </html>

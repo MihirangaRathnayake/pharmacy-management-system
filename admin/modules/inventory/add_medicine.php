@@ -51,16 +51,29 @@ if ($_POST) {
         ");
 
         $stmt->execute([
-            $name, $generic_name, $category_id, $supplier_id, $batch_number, $barcode,
-            $description, $dosage, $unit, $purchase_price, $selling_price, $stock_quantity,
-            $min_stock_level, $max_stock_level, $expiry_date, $manufacture_date, $prescription_required
+            $name,
+            $generic_name,
+            $category_id,
+            $supplier_id,
+            $batch_number,
+            $barcode,
+            $description,
+            $dosage,
+            $unit,
+            $purchase_price,
+            $selling_price,
+            $stock_quantity,
+            $min_stock_level,
+            $max_stock_level,
+            $expiry_date,
+            $manufacture_date,
+            $prescription_required
         ]);
 
         $success = 'Medicine added successfully!';
-        
+
         // Clear form data
         $_POST = [];
-        
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -71,30 +84,22 @@ $categories = $pdo->query("SELECT * FROM categories WHERE status = 'active' ORDE
 $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER BY name")->fetchAll();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<?php echo getThemeClass(); ?>">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Medicine - Pharmacy Management</title>
+    <?php include '../../includes/head.php'; ?>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons - Multiple CDN fallbacks -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-    <!-- FontAwesome 5 fallback -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
-    <link rel="stylesheet" href="../../assets/css/admin-icons-fix.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="../../assets/js/icon-fix.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
         .form-group {
             position: relative;
             margin-bottom: 1.5rem;
         }
-        
+
         .form-input {
             width: 100%;
             padding: 12px 16px;
@@ -104,14 +109,14 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
             transition: all 0.3s ease;
             background: white;
         }
-        
+
         .form-input:focus {
             outline: none;
             border-color: #10b981;
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
             transform: translateY(-1px);
         }
-        
+
         .form-label {
             position: absolute;
             left: 16px;
@@ -123,61 +128,68 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
             transition: all 0.3s ease;
             pointer-events: none;
         }
-        
-        .form-input:focus + .form-label,
-        .form-input:not(:placeholder-shown) + .form-label {
+
+        .form-input:focus+.form-label,
+        .form-input:not(:placeholder-shown)+.form-label {
             top: -8px;
             font-size: 12px;
             color: #10b981;
             font-weight: 500;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             transition: all 0.3s ease;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
         }
-        
+
         .card {
             background: white;
             border-radius: 16px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
-        
+
         .card:hover {
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .alert {
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 24px;
             animation: slideIn 0.3s ease;
         }
-        
+
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         .progress-bar {
             height: 4px;
             background: linear-gradient(90deg, #10b981 0%, #059669 100%);
             border-radius: 2px;
             transition: width 0.3s ease;
         }
-        
+
         .section-divider {
             border-left: 4px solid #10b981;
             padding-left: 16px;
             margin: 32px 0 24px 0;
         }
-        
+
         .floating-label select {
             appearance: none;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
@@ -188,9 +200,10 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+
+<body class="pc-shell">
     <?php include '../../includes/navbar.php'; ?>
-    
+
     <div class="container mx-auto px-4 py-8 max-w-4xl">
         <!-- Header -->
         <div class="mb-8">
@@ -203,7 +216,7 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                     <p class="text-gray-600">Add a new medicine to your inventory</p>
                 </div>
             </div>
-            
+
             <!-- Progress Bar -->
             <div class="bg-gray-200 rounded-full h-2 mb-6">
                 <div class="progress-bar w-0" id="progressBar"></div>
@@ -239,18 +252,18 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                         Basic Information
                     </h2>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-group floating-label">
                         <input type="text" name="name" class="form-input" placeholder=" " required value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
                         <label class="form-label">Medicine Name *</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <input type="text" name="generic_name" class="form-input" placeholder=" " value="<?php echo htmlspecialchars($_POST['generic_name'] ?? ''); ?>">
                         <label class="form-label">Generic Name</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <select name="category_id" class="form-input" required>
                             <option value="">Select Category</option>
@@ -262,7 +275,7 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                         </select>
                         <label class="form-label">Category *</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <select name="supplier_id" class="form-input" required>
                             <option value="">Select Supplier</option>
@@ -275,7 +288,7 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                         <label class="form-label">Supplier *</label>
                     </div>
                 </div>
-                
+
                 <div class="form-group floating-label mt-6">
                     <textarea name="description" class="form-input" rows="3" placeholder=" "><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
                     <label class="form-label">Description</label>
@@ -290,24 +303,24 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                         Product Details
                     </h2>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="form-group floating-label">
                         <input type="text" name="batch_number" class="form-input" placeholder=" " value="<?php echo htmlspecialchars($_POST['batch_number'] ?? ''); ?>">
                         <label class="form-label">Batch Number</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <input type="text" name="barcode" class="form-input" placeholder=" " value="<?php echo htmlspecialchars($_POST['barcode'] ?? ''); ?>">
                         <label class="form-label">Barcode</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <input type="text" name="dosage" class="form-input" placeholder=" " value="<?php echo htmlspecialchars($_POST['dosage'] ?? ''); ?>">
                         <label class="form-label">Dosage (e.g., 500mg)</label>
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div class="form-group floating-label">
                         <select name="unit" class="form-input" required>
@@ -319,7 +332,7 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                         </select>
                         <label class="form-label">Unit *</label>
                     </div>
-                    
+
                     <div class="flex items-center space-x-4 mt-4">
                         <label class="flex items-center space-x-2 cursor-pointer">
                             <input type="checkbox" name="prescription_required" class="w-5 h-5 text-green-600 rounded focus:ring-green-500" <?php echo isset($_POST['prescription_required']) ? 'checked' : ''; ?>>
@@ -337,30 +350,30 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                         Pricing & Stock
                     </h2>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-group floating-label">
                         <input type="number" name="purchase_price" class="form-input" step="0.01" placeholder=" " required value="<?php echo $_POST['purchase_price'] ?? ''; ?>">
                         <label class="form-label">Purchase Price (Rs) *</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <input type="number" name="selling_price" class="form-input" step="0.01" placeholder=" " required value="<?php echo $_POST['selling_price'] ?? ''; ?>">
                         <label class="form-label">Selling Price (Rs) *</label>
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <div class="form-group floating-label">
                         <input type="number" name="stock_quantity" class="form-input" placeholder=" " required value="<?php echo $_POST['stock_quantity'] ?? '0'; ?>">
                         <label class="form-label">Stock Quantity *</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <input type="number" name="min_stock_level" class="form-input" placeholder=" " value="<?php echo $_POST['min_stock_level'] ?? '10'; ?>">
                         <label class="form-label">Min Stock Level</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <input type="number" name="max_stock_level" class="form-input" placeholder=" " value="<?php echo $_POST['max_stock_level'] ?? '1000'; ?>">
                         <label class="form-label">Max Stock Level</label>
@@ -376,13 +389,13 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                         Important Dates
                     </h2>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-group floating-label">
                         <input type="date" name="manufacture_date" class="form-input" placeholder=" " value="<?php echo $_POST['manufacture_date'] ?? ''; ?>">
                         <label class="form-label">Manufacture Date</label>
                     </div>
-                    
+
                     <div class="form-group floating-label">
                         <input type="date" name="expiry_date" class="form-input" placeholder=" " value="<?php echo $_POST['expiry_date'] ?? ''; ?>">
                         <label class="form-label">Expiry Date</label>
@@ -407,7 +420,7 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
         const form = document.getElementById('medicineForm');
         const progressBar = document.getElementById('progressBar');
         const requiredFields = form.querySelectorAll('[required]');
-        
+
         function updateProgress() {
             let filledFields = 0;
             requiredFields.forEach(field => {
@@ -415,24 +428,24 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                     filledFields++;
                 }
             });
-            
+
             const progress = (filledFields / requiredFields.length) * 100;
             progressBar.style.width = progress + '%';
         }
-        
+
         // Update progress on input
         requiredFields.forEach(field => {
             field.addEventListener('input', updateProgress);
             field.addEventListener('change', updateProgress);
         });
-        
+
         // Initial progress update
         updateProgress();
-        
+
         // Price validation
         const purchasePrice = document.querySelector('[name="purchase_price"]');
         const sellingPrice = document.querySelector('[name="selling_price"]');
-        
+
         function validatePrices() {
             if (purchasePrice.value && sellingPrice.value) {
                 if (parseFloat(sellingPrice.value) <= parseFloat(purchasePrice.value)) {
@@ -442,10 +455,10 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                 }
             }
         }
-        
+
         purchasePrice.addEventListener('input', validatePrices);
         sellingPrice.addEventListener('input', validatePrices);
-        
+
         // Auto-dismiss alerts
         setTimeout(() => {
             const alerts = document.querySelectorAll('.alert');
@@ -455,7 +468,7 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
                 setTimeout(() => alert.remove(), 300);
             });
         }, 5000);
-        
+
         // Form animation on load
         document.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.card');
@@ -470,8 +483,6 @@ $suppliers = $pdo->query("SELECT * FROM suppliers WHERE status = 'active' ORDER 
             });
         });
     </script>
-    
-    <!-- Icon Fix Script -->
-    <script src="../../assets/js/icon-fix.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,55 @@
+# Environment configuration
+.env
+
+# Composer dependencies
+/vendor/
+
+# Node modules (if using npm)
+/node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Uploads (user-generated content)
+/uploads/*.jpg
+/uploads/*.jpeg
+/uploads/*.png
+/uploads/*.gif
+/uploads/*.pdf
+/uploads/*.doc
+/uploads/*.docx
+
+# Keep upload directories but ignore their contents
+uploads/*
+!uploads/.htaccess
+!uploads/*/
+uploads/*/*
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.swp
+*.bak
+*.old
+
+# Backup files
+*.sql.backup
+*.db.backup
+backup/
+
+# PHPStorm
+.phpunit.result.cache

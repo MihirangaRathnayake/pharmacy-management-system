@@ -12,31 +12,32 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?php echo getThemeClass(); ?>">
+
 <head>
     <title>New Sale - Pharmacy Management System</title>
     <?php include '../../includes/head.php'; ?>
-    <link rel="stylesheet" href="../../assets/css/admin-icons-fix.css">
-    <?php 
-    if (function_exists('getThemeCSS')) echo getThemeCSS(); 
-    if (function_exists('renderThemeScript')) renderThemeScript(); 
+    <?php
+    if (function_exists('getThemeCSS')) echo getThemeCSS();
+    if (function_exists('renderThemeScript')) renderThemeScript();
     ?>
 </head>
+
 <body class="pc-shell">
     <?php include '../../includes/navbar.php'; ?>
-    
+
     <div class="pc-container">
         <div class="pc-page-header pc-animate">
             <div class="pc-breadcrumb">Home <i class="fas fa-chevron-right"></i> Sales <i class="fas fa-chevron-right"></i> New Sale</div>
             <div class="flex justify-between items-center mb-0 gap-4">
-            <div>
-                <h1 class="pc-page-title">Point of Sale</h1>
-                <p class="pc-page-subtitle">Fast medicine lookup, cart, and checkout flow</p>
+                <div>
+                    <h1 class="pc-page-title">Point of Sale</h1>
+                    <p class="pc-page-subtitle">Fast medicine lookup, cart, and checkout flow</p>
+                </div>
+                <a href="index.php" class="pc-btn pc-btn-muted">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Sales</span>
+                </a>
             </div>
-            <a href="index.php" class="pc-btn pc-btn-muted">
-                <i class="fas fa-arrow-left"></i>
-                <span>Back to Sales</span>
-            </a>
-        </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -44,14 +45,14 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="lg:col-span-2">
                 <div class="pc-card p-6">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Sale Information</h2>
-                    
+
                     <form id="saleForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Number</label>
-                                <input type="text" id="invoiceNumber" readonly 
-                                       class="pc-input bg-gray-50"
-                                       value="INV-<?php echo date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT); ?>">
+                                <input type="text" id="invoiceNumber" readonly
+                                    class="pc-input bg-gray-50"
+                                    value="INV-<?php echo date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT); ?>">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Customer</label>
@@ -71,9 +72,9 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
                             <label class="block text-sm font-medium text-gray-700 mb-2">Add Medicine</label>
                             <div class="flex space-x-2">
                                 <input type="text" id="medicineSearch" placeholder="Search medicine by name or barcode..."
-                                       class="flex-1 pc-input">
-                                <button type="button" onclick="searchMedicine()" 
-                                        class="pc-btn pc-btn-secondary">
+                                    class="flex-1 pc-input">
+                                <button type="button" onclick="searchMedicine()"
+                                    class="pc-btn pc-btn-secondary">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -117,7 +118,7 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
                                 <input type="text" id="notes" placeholder="Optional notes..."
-                                       class="pc-input">
+                                    class="pc-input">
                             </div>
                         </div>
                     </form>
@@ -128,7 +129,7 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="lg:col-span-1">
                 <div class="pc-card p-6 sticky top-24">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Sale Summary</h2>
-                    
+
                     <div class="space-y-3 mb-6">
                         <div class="flex justify-between">
                             <span class="text-gray-600">Subtotal:</span>
@@ -138,8 +139,8 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
                             <span class="text-gray-600">Discount:</span>
                             <div class="flex items-center space-x-2">
                                 <input type="number" id="discountAmount" value="0" min="0" step="0.01"
-                                       class="pc-input w-20 text-sm"
-                                       onchange="updateTotals()">
+                                    class="pc-input w-20 text-sm"
+                                    onchange="updateTotals()">
                                 <span class="text-sm text-gray-500">Rs</span>
                             </div>
                         </div>
@@ -154,8 +155,8 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
 
-                    <button type="button" onclick="processSale()" 
-                            class="w-full pc-btn pc-btn-primary py-3">
+                    <button type="button" onclick="processSale()"
+                        class="w-full pc-btn pc-btn-primary py-3">
                         <i class="fas fa-shopping-cart mr-2"></i>
                         Complete Sale
                     </button>
@@ -167,4 +168,5 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="../../assets/js/admin-icons-fix.js"></script>
     <script src="../../assets/js/sales.js"></script>
 </body>
+
 </html>
