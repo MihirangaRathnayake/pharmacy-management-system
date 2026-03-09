@@ -1,0 +1,291 @@
+/* Admin FontAwesome Icons Fix */
+
+/* Ensure FontAwesome fonts load properly */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css');
+
+/* Force FontAwesome font family for all icons */
+.fas,
+.far,
+.fab,
+.fal,
+.fad,
+.fa {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "Font Awesome 5 Pro" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    line-height: 1 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Specific icon fixes for common admin icons */
+.fa-tachometer-alt:before {
+    content: "\f3fd";
+}
+
+.fa-user:before {
+    content: "\f007";
+}
+
+.fa-rupee-sign:before {
+    content: "\f156";
+}
+
+.fa-exclamation-triangle:before {
+    content: "\f071";
+}
+
+.fa-clock:before {
+    content: "\f017";
+}
+
+.fa-users:before {
+    content: "\f0c0";
+}
+
+.fa-bolt:before {
+    content: "\f0e7";
+}
+
+.fa-plus-circle:before {
+    content: "\f055";
+}
+
+.fa-shopping-cart:before {
+    content: "\f07a";
+}
+
+.fa-upload:before {
+    content: "\f093";
+}
+
+.fa-user-plus:before {
+    content: "\f234";
+}
+
+.fa-arrow-right:before {
+    content: "\f061";
+}
+
+.fa-cog:before {
+    content: "\f013";
+}
+
+.fa-sign-out-alt:before {
+    content: "\f2f5";
+}
+
+.fa-pills:before {
+    content: "\f484";
+}
+
+.fa-home:before {
+    content: "\f015";
+}
+
+.fa-chart-line:before {
+    content: "\f201";
+}
+
+.fa-chart-bar:before {
+    content: "\f080";
+}
+
+.fa-history:before {
+    content: "\f1da";
+}
+
+.fa-key:before {
+    content: "\f084";
+}
+
+.fa-save:before {
+    content: "\f0c7";
+}
+
+.fa-edit:before {
+    content: "\f044";
+}
+
+.fa-times:before {
+    content: "\f00d";
+}
+
+.fa-camera:before {
+    content: "\f030";
+}
+
+.fa-shopping-bag:before {
+    content: "\f290";
+}
+
+.fa-cash-register:before {
+    content: "\f788";
+}
+
+.fa-circle:before {
+    content: "\f111";
+}
+
+/* Ensure icons are visible and properly sized */
+i[class*="fa-"] {
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+/* Fix for dashboard icons */
+.dashboard-icon {
+    font-size: 1.5rem !important;
+    color: inherit !important;
+}
+
+/* Fix for navigation icons */
+.nav-icon {
+    font-size: 1rem !important;
+    margin-right: 0.5rem !important;
+}
+
+/* Fix for button icons */
+.btn-icon {
+    font-size: 1rem !important;
+    margin-right: 0.25rem !important;
+}
+
+/* Ensure all FontAwesome classes work */
+.fa,
+.fas,
+.far,
+.fal,
+.fab,
+.fad {
+    -moz-osx-font-smoothing: grayscale !important;
+    -webkit-font-smoothing: antialiased !important;
+    display: inline-block !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    line-height: 1 !important;
+}
+
+/* Fallback for missing icons */
+.fa:before,
+.fas:before,
+.far:before,
+.fal:before,
+.fab:before,
+.fad:before {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+}
+
+/* Specific fixes for admin dashboard */
+.admin-dashboard .fa,
+.admin-dashboard .fas,
+.admin-dashboard .far,
+.admin-dashboard .fab {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+}
+
+/* Quick action icons */
+.quick-action-icon {
+    font-size: 2rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Stats card icons */
+.stats-icon {
+    font-size: 1.25rem !important;
+}
+
+/* Force display for hidden icons */
+.fa-hidden,
+.fas-hidden,
+.far-hidden {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Responsive icon sizes */
+@media (max-width: 768px) {
+    .quick-action-icon {
+        font-size: 1.5rem !important;
+    }
+
+    .dashboard-icon {
+        font-size: 1.25rem !important;
+    }
+}
+
+/* Emergency fallback - ensure all icons are at least visible */
+.fa,
+.fas,
+.far,
+.fab,
+.fal,
+.fad {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: inherit !important;
+}
+
+/* If FontAwesome fails to load, show text fallback */
+.fa-tachometer-alt:not(:before) {
+    content: "📊";
+}
+
+.fa-user:not(:before) {
+    content: "👤";
+}
+
+.fa-rupee-sign:not(:before) {
+    content: "₹";
+}
+
+.fa-exclamation-triangle:not(:before) {
+    content: "⚠️";
+}
+
+.fa-clock:not(:before) {
+    content: "🕐";
+}
+
+.fa-users:not(:before) {
+    content: "👥";
+}
+
+.fa-bolt:not(:before) {
+    content: "⚡";
+}
+
+.fa-plus-circle:not(:before) {
+    content: "➕";
+}
+
+.fa-shopping-cart:not(:before) {
+    content: "🛒";
+}
+
+.fa-upload:not(:before) {
+    content: "📤";
+}
+
+.fa-user-plus:not(:before) {
+    content: "👤➕";
+}
+
+.fa-cog:not(:before) {
+    content: "⚙️";
+}
+
+.fa-sign-out-alt:not(:before) {
+    content: "🚪";
+}

@@ -1,221 +1,289 @@
-# Pharmacy Management System
+# Pharmacy Management System - Client Website
 
-A comprehensive web-based Pharmacy Management System built with PHP and Tailwind CSS, designed to manage daily pharmacy operations with a focus on performance, accuracy, security, and customer convenience.
+A modern, secure, and user-friendly client-facing website for the Pharmacy Management System. Built with PHP 8.2, MySQL, and modern web technologies.
 
-## Features
+## 🚀 Features
 
-### 🏥 Core Functionality
-- **Medicine Inventory Management**: Track stock levels, expiry dates, and suppliers with auto-alerts
-- **Sales & Billing**: Generate detailed invoices with tax and discount calculations
-- **Customer Records**: Store prescription history, personal info, and contact details
-- **Prescription Upload**: Secure file upload with pharmacist verification
-- **Shopping Cart & Checkout**: Multi-step checkout process
-- **Reporting & Analytics**: Daily, weekly, and monthly sales reports
+### 🛒 E-Commerce Functionality
+- **Product Catalog**: Browse medicines by category with search and filtering
+- **Shopping Cart**: Session-based cart with quantity management
+- **Secure Checkout**: Cash on Delivery (COD) payment system
+- **Order Management**: Complete order history and tracking
 
 ### 👥 User Management
-- **Role-based Access Control**: Admin, Pharmacist, and Customer roles
-- **Secure Authentication**: Registration, login, and logout functionality
-- **Profile Management**: User profiles with image support
+- **User Registration & Login**: Secure authentication system
+- **Profile Management**: Update personal information and passwords
+- **Order History**: View past orders and their status
 
-### 📊 Dashboard Features
-- **Real-time Metrics**: Sales today, stock alerts, pending orders
-- **Quick Actions**: Add medicine, new sale, upload prescription
-- **Recent Activity**: Latest sales and stock alerts
-- **Notifications**: Low stock and expiry alerts
+### 🎨 Modern UI/UX
+- **Responsive Design**: Mobile-first approach with Tailwind-inspired CSS
+- **Inter Font**: Professional typography via Google Fonts
+- **Font Awesome Icons**: Comprehensive icon system (v6.6.0)
+- **Accessible**: WCAG compliant with proper ARIA labels and focus states
 
-### 🎨 UI/UX Design
-- **Modern Interface**: Clean, minimal layout with intuitive navigation
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Professional Typography**: Inter font for readability
-- **Font Awesome Icons**: Clear visual cues throughout the interface
-- **Consistent Color Palette**: Pharmacy green (#28a745) with gray accents
+### 🔒 Security Features
+- **CSRF Protection**: Token-based protection for all forms
+- **Password Security**: bcrypt hashing with strong password requirements
+- **SQL Injection Prevention**: PDO prepared statements throughout
+- **Session Security**: Hardened session configuration
+- **Input Validation**: Server-side validation and output escaping
 
-## Technology Stack
+## 🛠 Technology Stack
 
-- **Backend**: PHP 7.4+
-- **Database**: MySQL 5.7+
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **CSS Framework**: Tailwind CSS
-- **Icons**: Font Awesome 6.4.0
-- **Typography**: Inter Font Family
+- **Backend**: PHP 8.2+ with PDO
+- **Database**: MySQL 8.x
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Fonts**: Inter (Google Fonts)
+- **Icons**: Font Awesome 6.6.0
+- **Architecture**: MVC-inspired with clean separation of concerns
 
-## Installation
+## 📁 Project Structure
+
+```
+pharmacy-client/
+├── public/                 # Public web files
+│   ├── index.php          # Homepage
+│   ├── shop.php           # Product catalog
+│   ├── product.php        # Product details
+│   ├── cart.php           # Shopping cart
+│   ├── checkout.php       # Checkout process
+│   ├── login.php          # User login
+│   ├── register.php       # User registration
+│   ├── logout.php         # Logout handler
+│   ├── profile.php        # User profile
+│   ├── orders.php         # Order history
+│   └── contact.php        # Contact page
+├── actions/               # Form processing
+│   ├── auth_login.php     # Login processing
+│   ├── auth_register.php  # Registration processing
+│   ├── add_to_cart.php    # Add to cart
+│   ├── update_cart.php    # Update cart
+│   └── place_order.php    # Order placement
+├── partials/              # Reusable components
+│   ├── head.php           # HTML head section
+│   ├── header.php         # Site header
+│   └── footer.php         # Site footer
+├── core/                  # Core functionality
+│   ├── config.php         # Configuration
+│   ├── db.php             # Database layer
+│   ├── csrf.php           # CSRF protection
+│   ├── helpers.php        # Helper functions
+│   ├── auth.php           # Authentication
+│   └── init.php           # Application bootstrap
+├── assets/                # Static assets
+│   ├── css/
+│   │   └── styles.css     # Main stylesheet
+│   └── js/
+│       └── app.js         # Main JavaScript
+├── sql/
+│   └── schema.sql         # Database schema
+├── .htaccess              # Apache configuration
+└── README.md              # This file
+```
+
+## 🚀 Installation
 
 ### Prerequisites
-- PHP 7.4 or higher
-- MySQL 5.7 or higher
+- PHP 8.2 or higher
+- MySQL 8.x or higher
 - Web server (Apache/Nginx)
-- Composer (optional, for dependencies)
+- mod_rewrite enabled (for Apache)
 
-### Setup Instructions
+### Quick Setup
 
-1. **Clone the Repository**
+1. **Clone/Download the project**
    ```bash
    git clone <repository-url>
-   cd pharmacy-management-system
+   cd pharmacy-client
    ```
 
 2. **Database Setup**
-   - Create a MySQL database named `pharmacy_management`
-   - Import the database schema:
-   ```bash
-   mysql -u your_username -p pharmacy_management < database/schema.sql
-   ```
+   - Create a MySQL database named `pharmacy_client`
+   - Import the schema: `mysql -u username -p pharmacy_client < sql/schema.sql`
 
 3. **Configuration**
-   - Update database credentials in `config/database.php`:
+   - Edit `core/config.php` with your database credentials:
    ```php
-   private $host = 'localhost';
-   private $db_name = 'pharmacy_management';
-   private $username = 'your_username';
-   private $password = 'your_password';
+   define('DB_HOST', 'localhost');
+   define('DB_NAME', 'pharmacy_client');
+   define('DB_USER', 'your_username');
+   define('DB_PASS', 'your_password');
    ```
 
-4. **File Permissions**
-   ```bash
-   chmod 755 uploads/
-   chmod 755 uploads/prescriptions/
-   ```
-
-5. **Web Server Configuration**
+4. **Web Server Setup**
    - Point your web server document root to the project directory
-   - Ensure mod_rewrite is enabled (for Apache)
+   - Ensure `.htaccess` is enabled (Apache) or configure URL rewriting (Nginx)
 
-## Default Login Credentials
+5. **Permissions**
+   - Ensure web server has read access to all files
+   - Set appropriate permissions for uploads directory (if added later)
 
-The system comes with pre-configured demo accounts:
+### Sample Data
 
-- **Admin**: admin@pharmacy.com / admin123
-- **Pharmacist**: pharmacist@pharmacy.com / pharma123
-- **Customer**: customer@pharmacy.com / customer123
+The schema includes sample data:
+- **3 Categories**: Pain Relief, Cold & Flu, Vitamins & Supplements
+- **12 Products**: Mix of OTC and prescription medicines
+- **3 Sample Users**: For testing (password: `password`)
+- **Sample Orders**: For demonstration
 
-## Project Structure
+### Test Accounts
 
-```
-pharmacy-management-system/
-├── api/                    # API endpoints
-│   ├── dashboard_stats.php
-│   ├── search_medicines.php
-│   ├── process_sale.php
-│   └── ...
-├── assets/                 # Static assets
-│   ├── js/                # JavaScript files
-│   └── css/               # Custom CSS files
-├── auth/                  # Authentication pages
-│   ├── login.php
-│   ├── logout.php
-│   └── register.php
-├── config/                # Configuration files
-│   └── database.php
-├── database/              # Database files
-│   └── schema.sql
-├── includes/              # Shared PHP includes
-│   ├── auth.php
-│   └── navbar.php
-├── modules/               # Feature modules
-│   ├── inventory/         # Inventory management
-│   ├── sales/            # Sales management
-│   ├── customers/        # Customer management
-│   ├── prescriptions/    # Prescription handling
-│   └── reports/          # Reporting system
-├── uploads/              # File uploads
-│   └── prescriptions/    # Prescription images
-├── index.php             # Dashboard homepage
-└── README.md
-```
+Default test accounts (password: `password`):
+- `john@example.com`
+- `jane@example.com`
+- `mike@example.com`
 
-## Key Features Breakdown
+## 🎨 Design System
 
-### Inventory Management
-- Add, edit, and delete medicines
-- Track stock levels with low stock alerts
-- Monitor expiry dates with advance warnings
-- Supplier management
-- Category-based organization
-- Barcode support
+### Colors
+- **Primary**: #0ea5e9 (Sky Blue)
+- **Accent**: #10b981 (Emerald Green)
+- **Text**: #0f172a (Slate)
+- **Background**: #f8fafc (Gray)
 
-### Sales System
-- Point-of-sale interface
-- Real-time medicine search
-- Shopping cart functionality
-- Multiple payment methods
-- Tax and discount calculations
-- Invoice generation
+### Typography
+- **Font Family**: Inter (Google Fonts)
+- **Weights**: 400 (Regular), 600 (Semibold), 700 (Bold)
 
-### Customer Management
-- Customer registration and profiles
-- Prescription history tracking
-- Loyalty points system
-- Contact information management
+### Components
+- **Buttons**: Primary, secondary, and accent variants
+- **Forms**: Consistent styling with validation states
+- **Cards**: Product cards, info cards with hover effects
+- **Navigation**: Responsive header with mobile menu
 
-### Prescription Handling
-- Secure file upload (images/PDF)
-- Pharmacist verification workflow
-- Prescription to order conversion
-- Digital prescription storage
+## 🔧 Configuration
 
-### Reporting & Analytics
-- Sales reports (daily, weekly, monthly)
-- Inventory reports
-- Customer analytics
-- Profit margin analysis
-- Export functionality
+### Environment Settings
+Edit `core/config.php` to customize:
+- Database connection
+- Site name and URL
+- Session lifetime
+- File upload settings
+- Pagination limits
 
-## Security Features
+### Security Settings
+- CSRF token lifetime
+- Session configuration
+- Password requirements
+- File upload restrictions
 
-- **Password Hashing**: Secure password storage using PHP's password_hash()
-- **SQL Injection Prevention**: Prepared statements throughout
-- **Session Management**: Secure session handling
-- **File Upload Security**: Validated file types and sizes
-- **Role-based Access**: Proper authorization checks
-- **Input Validation**: Server-side validation for all inputs
+## 📱 Responsive Design
 
-## Performance Optimizations
+The website is fully responsive with breakpoints:
+- **Mobile**: < 640px
+- **Tablet**: 640px - 1024px
+- **Desktop**: > 1024px
 
-- **Database Indexing**: Optimized database queries with proper indexes
-- **Lazy Loading**: Pagination for large datasets
-- **AJAX Requests**: Asynchronous data loading
-- **Caching**: Browser caching for static assets
-- **Optimized Images**: Compressed images and icons
+## 🔒 Security Features
 
-## Browser Support
+### Authentication
+- Secure password hashing (bcrypt)
+- Session regeneration on login
+- Strong password requirements
+- Account lockout protection (configurable)
 
+### Data Protection
+- CSRF tokens on all forms
+- SQL injection prevention (PDO)
+- XSS protection (output escaping)
+- Input validation and sanitization
+
+### Headers
+- X-Content-Type-Options: nosniff
+- X-XSS-Protection: 1; mode=block
+- X-Frame-Options: DENY
+- Content Security Policy
+
+## 🚀 Performance
+
+### Optimizations
+- Database indexing
+- Query optimization
+- Browser caching headers
+- Gzip compression
+- Lazy loading for images
+- Minified assets
+
+### Caching
+- Browser caching for static assets
+- Database query optimization
+- Session-based cart storage
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+- [ ] User registration and login
+- [ ] Product browsing and search
+- [ ] Cart functionality
+- [ ] Checkout process
+- [ ] Order management
+- [ ] Profile updates
+- [ ] Responsive design
+- [ ] Security features
+
+### Browser Support
 - Chrome 70+
 - Firefox 65+
 - Safari 12+
 - Edge 79+
-- Mobile browsers (iOS Safari, Chrome Mobile)
+- Mobile browsers
 
-## Contributing
+## 🔧 Customization
+
+### Branding
+- Update `SITE_NAME` in `core/config.php`
+- Modify colors in `assets/css/styles.css`
+- Replace logo and favicon
+- Update contact information
+
+### Features
+- Add payment gateways
+- Implement email notifications
+- Add product reviews
+- Integrate with inventory system
+- Add prescription upload
+
+## 📈 SEO Features
+
+- Semantic HTML structure
+- Meta tags and descriptions
+- Open Graph tags
+- Clean URLs
+- Sitemap ready
+- Schema markup ready
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/new-feature`)
-5. Create a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Support
+## 🆘 Support
 
 For support and questions:
+- Check the documentation
+- Review the code comments
 - Create an issue in the repository
-- Email: support@pharmacare.com
-- Documentation: [Project Wiki](wiki-url)
 
-## Roadmap
+## 🗺 Roadmap
 
 ### Upcoming Features
+- [ ] Email notifications
+- [ ] SMS alerts
+- [ ] Payment gateway integration
+- [ ] Prescription upload
+- [ ] Product reviews and ratings
+- [ ] Wishlist functionality
+- [ ] Advanced search filters
+- [ ] Multi-language support
+- [ ] API endpoints
 - [ ] Mobile app integration
-- [ ] Barcode scanning
-- [ ] SMS notifications
-- [ ] Advanced analytics dashboard
-- [ ] Multi-location support
-- [ ] API for third-party integrations
-- [ ] Automated reorder system
-- [ ] Insurance claim processing
 
 ---
 
