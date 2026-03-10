@@ -236,15 +236,12 @@ CREATE TABLE password_reset_tokens (
     user_id INT NOT NULL,
     email VARCHAR(100) NOT NULL,
     token VARCHAR(255) NOT NULL,
-    verification_code VARCHAR(6),
     expires_at DATETIME NOT NULL,
     used BOOLEAN DEFAULT FALSE,
-    verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_token (token),
     INDEX idx_email (email),
-    INDEX idx_code (verification_code),
     INDEX idx_expires (expires_at)
 );
 

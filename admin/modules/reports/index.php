@@ -15,16 +15,50 @@ try {
     $todaySales = $pdo->query("SELECT COALESCE(SUM(total_amount), 0) as total FROM sales WHERE DATE(sale_date) = CURDATE()")->fetch()['total'];
     $monthSales = $pdo->query("SELECT COALESCE(SUM(total_amount), 0) as total FROM sales WHERE MONTH(sale_date) = MONTH(CURDATE()) AND YEAR(sale_date) = YEAR(CURDATE())")->fetch()['total'];
     $yearSales = $pdo->query("SELECT COALESCE(SUM(total_amount), 0) as total FROM sales WHERE YEAR(sale_date) = YEAR(CURDATE())")->fetch()['total'];
-    
+
     // Customer Analytics
     $totalCustomers = $pdo->query("SELECT COUNT(*) as count FROM customers WHERE status = 'active'")->fetch()['count'];
     $newCustomersThisMonth = $pdo->query("SELECT COUNT(*) as count FROM customers WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())")->fetch()['count'];
-    
+
     // Inventory Analytics
     $totalMedicines = $pdo->query("SELECT COUNT(*) as count FROM medicines WHERE status = 'active'")->fetch()['count'];
     $lowStockItems = $pdo->query("SELECT COUNT(*) as count FROM medicines WHERE stock_quantity <= min_stock_level AND status = 'active'")->fetch()['count'];
     $expiringSoon = $pdo->query("SELECT COUNT(*) as count FROM medicines WHERE expiry_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) AND expiry_date > CURDATE() AND status = 'active'")->fetch()['count'];
-    
+
+    // Supplier Analytics
+    $totalSuppliers = $pdo->query("SELECT COUNT(*) as count FROM suppliers WHERE status = 'active'")->fetch()['count'];
+    $inactiveSuppliers = $pdo->query("SELECT COUNT(*) as count FROM suppliers WHERE status = 'inactive'")->fetch()['count'];
+
+    // Top Suppliers by medicine count and stock value
+    $topSuppliers = $pdo->query("
+        SELECT 
+            s.id, s.name, s.contact_person, s.phone, s.status,
+            COUNT(DISTINCT m.id) as medicine_count,
+            COALESCE(SUM(m.stock_quantity), 0) as total_stock,
+            COALESCE(SUM(m.stock_quantity * m.purchase_price), 0) as purchase_value,
+            COALESCE(SUM(m.stock_quantity * m.selling_price), 0) as selling_value,
+            SUM(CASE WHEN m.stock_quantity <= m.min_stock_level AND m.status = 'active' THEN 1 ELSE 0 END) as low_stock_items,
+            SUM(CASE WHEN m.expiry_date IS NOT NULL AND m.expiry_date < CURDATE() AND m.status = 'active' THEN 1 ELSE 0 END) as expired_items
+        FROM suppliers s
+        LEFT JOIN medicines m ON s.id = m.supplier_id AND m.status = 'active'
+        WHERE s.status = 'active'
+        GROUP BY s.id, s.name, s.contact_person, s.phone, s.status
+        ORDER BY selling_value DESC
+    ")->fetchAll();
+
+    // Supplier stock distribution for chart
+    $supplierStockData = $pdo->query("
+        SELECT 
+            s.name,
+            COALESCE(SUM(m.stock_quantity), 0) as total_stock
+        FROM suppliers s
+        LEFT JOIN medicines m ON s.id = m.supplier_id AND m.status = 'active'
+        WHERE s.status = 'active'
+        GROUP BY s.id, s.name
+        ORDER BY total_stock DESC
+        LIMIT 10
+    ")->fetchAll();
+
     // Monthly Sales Data for Chart
     $monthlySalesData = $pdo->query("
         SELECT 
@@ -36,7 +70,7 @@ try {
         GROUP BY MONTH(sale_date), MONTHNAME(sale_date)
         ORDER BY MONTH(sale_date)
     ")->fetchAll();
-    
+
     // Top Selling Medicines
     $topMedicines = $pdo->query("
         SELECT 
@@ -51,7 +85,7 @@ try {
         ORDER BY total_sold DESC
         LIMIT 10
     ")->fetchAll();
-    
+
     // Category-wise Sales
     $categorySales = $pdo->query("
         SELECT 
@@ -66,7 +100,7 @@ try {
         GROUP BY c.id, c.name
         ORDER BY revenue DESC
     ")->fetchAll();
-    
+
     // Daily Sales for Current Month
     $dailySales = $pdo->query("
         SELECT 
@@ -77,7 +111,7 @@ try {
         GROUP BY DAY(sale_date)
         ORDER BY DAY(sale_date)
     ")->fetchAll();
-    
+
     // Payment Method Distribution
     $paymentMethods = $pdo->query("
         SELECT 
@@ -88,20 +122,22 @@ try {
         WHERE MONTH(sale_date) = MONTH(CURDATE()) AND YEAR(sale_date) = YEAR(CURDATE())
         GROUP BY payment_method
     ")->fetchAll();
-    
 } catch (Exception $e) {
     $error = $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
 <html lang="en" data-theme="<?php echo getThemeClass(); ?>">
+
 <head>
     <title>Analytics & Reports - Pharmacy Management</title>
     <?php include '../../includes/head.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
         /* Ensure theme variables are available */
         :root {
             --bg-primary: #ffffff;
@@ -113,7 +149,7 @@ try {
             --border-color: #e5e7eb;
             --shadow: rgba(0, 0, 0, 0.1);
         }
-        
+
         [data-theme="dark"] {
             --bg-primary: #111827;
             --bg-secondary: #1f2937;
@@ -124,7 +160,7 @@ try {
             --border-color: #374151;
             --shadow: rgba(0, 0, 0, 0.3);
         }
-        
+
         .stat-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 12px;
@@ -134,7 +170,7 @@ try {
             overflow: hidden;
             transition: all 0.3s ease;
         }
-        
+
         .stat-card::before {
             content: '';
             position: absolute;
@@ -146,12 +182,12 @@ try {
             border-radius: 50%;
             transform: translate(30px, -30px);
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         }
-        
+
         .chart-container {
             background: var(--bg-primary);
             border-radius: 12px;
@@ -160,27 +196,51 @@ try {
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
         }
-        
+
         .chart-container:hover {
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        
-        .gradient-bg-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .gradient-bg-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .gradient-bg-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .gradient-bg-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        .gradient-bg-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-        .gradient-bg-6 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
-        
+
+        .gradient-bg-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-bg-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .gradient-bg-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .gradient-bg-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .gradient-bg-5 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .gradient-bg-6 {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
         .animate-counter {
             animation: countUp 2s ease-out;
         }
-        
+
         @keyframes countUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         .filter-tabs {
             display: flex;
             background: var(--bg-tertiary);
@@ -188,7 +248,7 @@ try {
             padding: 4px;
             margin-bottom: 24px;
         }
-        
+
         .filter-tab {
             flex: 1;
             padding: 12px 24px;
@@ -198,13 +258,13 @@ try {
             transition: all 0.3s ease;
             font-weight: 500;
         }
-        
+
         .filter-tab.active {
             background: var(--bg-primary);
             color: #667eea;
             box-shadow: 0 2px 4px var(--shadow);
         }
-        
+
         .metric-item {
             display: flex;
             align-items: center;
@@ -214,12 +274,12 @@ try {
             margin-bottom: 12px;
             transition: all 0.3s ease;
         }
-        
+
         .metric-item:hover {
             background: var(--bg-secondary);
             transform: translateX(4px);
         }
-        
+
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -229,17 +289,23 @@ try {
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
     <?php renderThemeScript(); ?>
 </head>
+
 <body class="pc-shell min-h-screen">
     <?php include '../../includes/navbar.php'; ?>
-    
+
     <div class="pc-container">
         <div class="pc-page-header pc-animate mb-8">
             <div class="pc-breadcrumb">Home <i class="fas fa-chevron-right"></i> Reports</div>
@@ -251,7 +317,7 @@ try {
                     </h1>
                     <p class="pc-page-subtitle">Comprehensive insights into sales, stock, and growth</p>
                 </div>
-                
+
                 <div class="flex space-x-4">
                     <button onclick="exportReport()" class="pc-btn pc-btn-primary">
                         <i class="fas fa-download mr-2"></i>Export Report
@@ -261,7 +327,7 @@ try {
                     </button>
                 </div>
             </div>
-            
+
             <!-- Time Filter Tabs -->
             <div class="filter-tabs">
                 <div class="filter-tab active" onclick="changeTimeFilter('today')">Today</div>
@@ -272,7 +338,7 @@ try {
         </div>
 
         <!-- Key Metrics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <div class="stat-card gradient-bg-1">
                 <div class="flex items-center justify-between relative z-10">
                     <div>
@@ -287,7 +353,7 @@ try {
                     </div>
                 </div>
             </div>
-            
+
             <div class="stat-card gradient-bg-2">
                 <div class="flex items-center justify-between relative z-10">
                     <div>
@@ -302,7 +368,7 @@ try {
                     </div>
                 </div>
             </div>
-            
+
             <div class="stat-card gradient-bg-3">
                 <div class="flex items-center justify-between relative z-10">
                     <div>
@@ -317,7 +383,7 @@ try {
                     </div>
                 </div>
             </div>
-            
+
             <div class="stat-card gradient-bg-4">
                 <div class="flex items-center justify-between relative z-10">
                     <div>
@@ -329,6 +395,21 @@ try {
                     </div>
                     <div class="text-4xl text-white/30">
                         <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card gradient-bg-5">
+                <div class="flex items-center justify-between relative z-10">
+                    <div>
+                        <p class="text-white/80 text-sm font-medium">Active Suppliers</p>
+                        <p class="text-3xl font-bold animate-counter"><?php echo number_format($totalSuppliers); ?></p>
+                        <p class="text-white/60 text-xs mt-1">
+                            <i class="fas fa-truck mr-1"></i><?php echo $inactiveSuppliers; ?> inactive
+                        </p>
+                    </div>
+                    <div class="text-4xl text-white/30">
+                        <i class="fas fa-truck"></i>
                     </div>
                 </div>
             </div>
@@ -349,7 +430,7 @@ try {
                     <canvas id="monthlySalesChart"></canvas>
                 </div>
             </div>
-            
+
             <!-- Category Distribution -->
             <div class="chart-container">
                 <div class="flex items-center justify-between mb-3">
@@ -363,7 +444,7 @@ try {
                     <canvas id="categoryChart"></canvas>
                 </div>
             </div>
-            
+
             <!-- Payment Methods -->
             <div class="chart-container">
                 <div class="flex items-center justify-between mb-3">
@@ -418,14 +499,14 @@ try {
                     <?php endforeach; ?>
                 </div>
             </div>
-            
+
             <!-- Inventory Alerts - Compact -->
             <div class="chart-container">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">
                     <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
                     Alerts
                 </h3>
-                
+
                 <div class="space-y-3">
                     <div class="bg-red-50 border border-red-200 rounded-lg p-3">
                         <div class="flex items-center">
@@ -436,7 +517,7 @@ try {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                         <div class="flex items-center">
                             <i class="fas fa-clock text-yellow-600 mr-2 text-sm"></i>
@@ -446,7 +527,7 @@ try {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="bg-green-50 border border-green-200 rounded-lg p-3">
                         <div class="flex items-center">
                             <i class="fas fa-check-circle text-green-600 mr-2 text-sm"></i>
@@ -456,6 +537,95 @@ try {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supplier Analytics Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <!-- Supplier Stock Distribution Chart -->
+            <div class="chart-container">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-truck text-blue-600 mr-2"></i>
+                        Supplier Stock
+                    </h3>
+                </div>
+                <div style="height: 200px;">
+                    <canvas id="supplierStockChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Suppliers Table -->
+            <div class="chart-container lg:col-span-2">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-ranking-star text-amber-500 mr-2"></i>
+                        Supplier Performance
+                    </h3>
+                    <a href="<?php echo moduleUrl('suppliers'); ?>" class="text-sm text-blue-600 hover:underline">View All</a>
+                </div>
+                <div class="overflow-x-auto max-h-[232px] overflow-y-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Medicines</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Value</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Alerts</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($topSuppliers as $sup): ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <i class="fas fa-truck text-blue-600 text-xs"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium text-gray-800"><?php echo htmlspecialchars($sup['name']); ?></p>
+                                                <?php if ($sup['contact_person']): ?>
+                                                    <p class="text-xs text-gray-400"><?php echo htmlspecialchars($sup['contact_person']); ?></p>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                            <?php echo $sup['medicine_count']; ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2 font-medium"><?php echo number_format($sup['total_stock']); ?></td>
+                                    <td class="px-3 py-2">
+                                        <p class="font-medium text-green-600">Rs <?php echo number_format($sup['selling_value'], 0); ?></p>
+                                        <p class="text-xs text-gray-400">Cost: Rs <?php echo number_format($sup['purchase_value'], 0); ?></p>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <?php if ($sup['low_stock_items'] > 0): ?>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 mr-1">
+                                                <i class="fas fa-arrow-down mr-1"></i><?php echo $sup['low_stock_items']; ?> low
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if ($sup['expired_items'] > 0): ?>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">
+                                                <i class="fas fa-clock mr-1"></i><?php echo $sup['expired_items']; ?> exp
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if ($sup['low_stock_items'] == 0 && $sup['expired_items'] == 0): ?>
+                                            <span class="text-xs text-green-600"><i class="fas fa-check-circle"></i> OK</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <?php if (empty($topSuppliers)): ?>
+                                <tr>
+                                    <td colspan="5" class="px-3 py-6 text-center text-gray-400">No suppliers found</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -471,7 +641,7 @@ try {
                     <i class="fas fa-shopping-cart text-2xl text-white/30"></i>
                 </div>
             </div>
-            
+
             <div class="stat-card gradient-bg-6" style="padding: 16px;">
                 <div class="flex items-center justify-between relative z-10">
                     <div>
@@ -481,7 +651,7 @@ try {
                     <i class="fas fa-user-plus text-2xl text-white/30"></i>
                 </div>
             </div>
-            
+
             <div class="stat-card gradient-bg-1" style="padding: 16px;">
                 <div class="flex items-center justify-between relative z-10">
                     <div>
@@ -544,7 +714,7 @@ try {
                                 size: 10
                             },
                             callback: function(value) {
-                                return 'Rs ' + (value/1000).toFixed(0) + 'K';
+                                return 'Rs ' + (value / 1000).toFixed(0) + 'K';
                             }
                         }
                     },
@@ -571,7 +741,7 @@ try {
                 datasets: [{
                     data: categorySalesData.map(item => item.revenue || 0),
                     backgroundColor: [
-                        '#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444', 
+                        '#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444',
                         '#3b82f6', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
                     ],
                     borderWidth: 0,
@@ -681,6 +851,62 @@ try {
             }
         });
 
+        // Supplier Stock Chart
+        const supplierStockData = <?php echo json_encode($supplierStockData); ?>;
+        const supplierStockChart = new Chart(document.getElementById('supplierStockChart'), {
+            type: 'bar',
+            data: {
+                labels: supplierStockData.map(item => (item.name || 'Unknown').substring(0, 12)),
+                datasets: [{
+                    label: 'Stock Qty',
+                    data: supplierStockData.map(item => item.total_stock || 0),
+                    backgroundColor: [
+                        '#667eea80', '#764ba280', '#10b98180', '#f59e0b80', '#ef444480',
+                        '#3b82f680', '#8b5cf680', '#06b6d480', '#84cc1680', '#f9731680'
+                    ],
+                    borderColor: [
+                        '#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444',
+                        '#3b82f6', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f1f5f9'
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         // Hide loading spinners
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
@@ -697,7 +923,7 @@ try {
                 tab.classList.remove('active');
             });
             event.target.classList.add('active');
-            
+
             // Here you would typically reload data based on the selected period
             console.log('Filter changed to:', period);
         }
@@ -714,11 +940,14 @@ try {
                 monthSales: <?php echo $monthSales; ?>,
                 totalCustomers: <?php echo $totalCustomers; ?>,
                 totalMedicines: <?php echo $totalMedicines; ?>,
-                lowStockItems: <?php echo $lowStockItems; ?>
+                lowStockItems: <?php echo $lowStockItems; ?>,
+                totalSuppliers: <?php echo $totalSuppliers; ?>
             };
-            
+
             const dataStr = JSON.stringify(reportData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const dataBlob = new Blob([dataStr], {
+                type: 'application/json'
+            });
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
             link.href = url;
@@ -744,7 +973,8 @@ try {
             observer.observe(card);
         });
     </script>
-    
+
     <script src="../../assets/js/admin-icons-fix.js"></script>
 </body>
+
 </html>

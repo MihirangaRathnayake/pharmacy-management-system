@@ -1,11 +1,11 @@
 <?php
 if (!isset($user) || !$user) {
-    $user = function_exists('getCurrentUser') ? getCurrentUser() : null;
+  $user = function_exists('getCurrentUser') ? getCurrentUser() : null;
 }
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 $profileImage = ($user && !empty($user['profile_image']))
-    ? url('uploads/profiles/' . $user['profile_image'])
-    : url('assets/images/default-avatar.svg');
+  ? url('uploads/profiles/' . $user['profile_image'])
+  : url('assets/images/default-avatar.svg');
 ?>
 <nav class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/92 backdrop-blur dark:bg-slate-900/95 dark:border-slate-700">
   <div class="pc-container !py-3">
@@ -26,6 +26,7 @@ $profileImage = ($user && !empty($user['profile_image']))
         <a href="<?php echo moduleUrl('inventory'); ?>" class="pc-btn pc-btn-muted <?php echo strpos($currentPath, '/modules/inventory') !== false ? 'ring-2 ring-emerald-200' : ''; ?>"><i class="fas fa-capsules"></i><span>Inventory</span></a>
         <a href="<?php echo moduleUrl('sales', 'new_sale.php'); ?>" class="pc-btn pc-btn-muted <?php echo strpos($currentPath, '/modules/sales') !== false ? 'ring-2 ring-emerald-200' : ''; ?>"><i class="fas fa-cash-register"></i><span>Sales</span></a>
         <a href="<?php echo moduleUrl('customers'); ?>" class="pc-btn pc-btn-muted <?php echo strpos($currentPath, '/modules/customers') !== false ? 'ring-2 ring-emerald-200' : ''; ?>"><i class="fas fa-users"></i><span>Customers</span></a>
+        <a href="<?php echo moduleUrl('suppliers'); ?>" class="pc-btn pc-btn-muted <?php echo strpos($currentPath, '/modules/suppliers') !== false ? 'ring-2 ring-emerald-200' : ''; ?>"><i class="fas fa-truck"></i><span>Suppliers</span></a>
         <a href="<?php echo moduleUrl('reports'); ?>" class="pc-btn pc-btn-muted <?php echo strpos($currentPath, '/modules/reports') !== false ? 'ring-2 ring-emerald-200' : ''; ?>"><i class="fas fa-chart-line"></i><span>Reports</span></a>
       </div>
 
@@ -64,36 +65,40 @@ $profileImage = ($user && !empty($user['profile_image']))
       <a href="<?php echo moduleUrl('inventory'); ?>" class="block rounded-lg px-3 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-capsules mr-2"></i>Inventory</a>
       <a href="<?php echo moduleUrl('sales', 'new_sale.php'); ?>" class="block rounded-lg px-3 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-cash-register mr-2"></i>Sales</a>
       <a href="<?php echo moduleUrl('customers'); ?>" class="block rounded-lg px-3 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-users mr-2"></i>Customers</a>
+      <a href="<?php echo moduleUrl('suppliers'); ?>" class="block rounded-lg px-3 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-truck mr-2"></i>Suppliers</a>
       <a href="<?php echo moduleUrl('reports'); ?>" class="block rounded-lg px-3 py-2 hover:bg-slate-50 text-sm"><i class="fas fa-chart-line mr-2"></i>Reports</a>
     </div>
   </div>
 </nav>
 <script>
-function toggleUserMenu() {
-  document.getElementById('userDropdown').classList.toggle('hidden');
-}
-function toggleNotifications() {
-  document.getElementById('notificationsDropdown').classList.toggle('hidden');
-}
-function toggleMobileMenu() {
-  document.getElementById('mobileMenu').classList.toggle('hidden');
-}
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  const next = current === 'dark' ? 'light' : 'dark';
-  if (window.PCUI) {
-    window.PCUI.applyTheme(next);
-    window.PCUI.showToast('Theme switched to ' + next, 'info');
-  } else {
-    document.documentElement.setAttribute('data-theme', next);
+  function toggleUserMenu() {
+    document.getElementById('userDropdown').classList.toggle('hidden');
   }
-}
-document.addEventListener('click', function (event) {
-  if (!event.target.closest('.relative')) {
-    const u = document.getElementById('userDropdown');
-    const n = document.getElementById('notificationsDropdown');
-    if (u) u.classList.add('hidden');
-    if (n) n.classList.add('hidden');
+
+  function toggleNotifications() {
+    document.getElementById('notificationsDropdown').classList.toggle('hidden');
   }
-});
+
+  function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    if (window.PCUI) {
+      window.PCUI.applyTheme(next);
+      window.PCUI.showToast('Theme switched to ' + next, 'info');
+    } else {
+      document.documentElement.setAttribute('data-theme', next);
+    }
+  }
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.relative')) {
+      const u = document.getElementById('userDropdown');
+      const n = document.getElementById('notificationsDropdown');
+      if (u) u.classList.add('hidden');
+      if (n) n.classList.add('hidden');
+    }
+  });
 </script>

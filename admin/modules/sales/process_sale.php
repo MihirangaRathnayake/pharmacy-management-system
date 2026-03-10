@@ -30,11 +30,11 @@ try {
     // Calculate totals
     $subtotal = 0;
     $tax_rate = 0.18; // 18% GST
-    
+
     foreach ($input['items'] as $item) {
         $subtotal += $item['quantity'] * $item['unit_price'];
     }
-    
+
     $discount_amount = floatval($input['discount_amount'] ?? 0);
     $tax_amount = ($subtotal - $discount_amount) * $tax_rate;
     $total_amount = $subtotal + $tax_amount - $discount_amount;
@@ -47,11 +47,11 @@ try {
         INSERT INTO sales (invoice_number, customer_id, user_id, subtotal, tax_amount, discount_amount, total_amount, payment_method, notes, status) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed')
     ");
-    
+
     $customer_id = !empty($input['customer_id']) ? $input['customer_id'] : null;
     $payment_method = $input['payment_method'] ?? 'cash';
     $notes = $input['notes'] ?? '';
-    
+
     $stmt->execute([
         $invoice_number,
         $customer_id,
@@ -68,21 +68,19 @@ try {
 
     // Insert sale items
     $stmt = $pdo->prepare("
-        INSERT INTO sale_items (sale_id, medicine_id, quantity, unit_price, total_price, tax_amount) 
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO sale_items (sale_id, medicine_id, quantity, unit_price, total_price) 
+        VALUES (?, ?, ?, ?, ?)
     ");
 
     foreach ($input['items'] as $item) {
         $item_total = $item['quantity'] * $item['unit_price'];
-        $item_tax = $item_total * $tax_rate;
-        
+
         $stmt->execute([
             $sale_id,
             $item['medicine_id'],
             $item['quantity'],
             $item['unit_price'],
-            $item_total,
-            $item_tax
+            $item_total
         ]);
 
         // Update medicine stock
@@ -100,10 +98,8 @@ try {
         'total_amount' => $total_amount,
         'invoice_url' => "invoice.php?id={$sale_id}"
     ]);
-
 } catch (Exception $e) {
     $pdo->rollBack();
     error_log("Sale processing error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Error processing sale: ' . $e->getMessage()]);
 }
-?>

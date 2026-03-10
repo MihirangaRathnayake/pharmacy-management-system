@@ -166,7 +166,7 @@ $customers = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script src="../../assets/js/admin-icons-fix.js"></script>
-    <script src="../../assets/js/sales.js"></script>
+    <script src="../../assets/js/sales.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
