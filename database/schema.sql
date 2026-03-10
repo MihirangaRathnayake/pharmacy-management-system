@@ -231,3 +231,44 @@ CREATE TABLE user_preferences (
     UNIQUE KEY unique_user_preferences (user_id)
 );
 
+-- Insert default admin user
+INSERT INTO users (name, email, password, role) VALUES 
+('Admin User', 'admin@pharmacy.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
+('Pharmacist', 'pharmacist@pharmacy.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'pharmacist'),
+('Customer', 'customer@pharmacy.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'customer');
+
+-- Insert default categories
+INSERT INTO categories (name, description) VALUES 
+('Pain Relief', 'Medicines for pain management'),
+('Antibiotics', 'Antibiotic medications'),
+('Vitamins', 'Vitamin supplements'),
+('Cold & Flu', 'Cold and flu medications'),
+('Diabetes', 'Diabetes management medicines'),
+('Heart', 'Cardiovascular medicines'),
+('Skin Care', 'Dermatological products'),
+('Digestive', 'Digestive system medicines');
+
+-- Insert default suppliers
+INSERT INTO suppliers (name, contact_person, email, phone, address) VALUES 
+('MediCorp Ltd', 'John Smith', 'john@medicorp.com', '+1234567890', '123 Medical Street, City'),
+('PharmaSupply Inc', 'Jane Doe', 'jane@pharmasupply.com', '+1234567891', '456 Supply Avenue, City'),
+('HealthDistributors', 'Mike Johnson', 'mike@healthdist.com', '+1234567892', '789 Health Boulevard, City');
+
+-- Insert sample medicines
+INSERT INTO medicines (name, generic_name, category_id, supplier_id, batch_number, purchase_price, selling_price, stock_quantity, min_stock_level, expiry_date, prescription_required) VALUES 
+('Paracetamol 500mg', 'Paracetamol', 1, 1, 'PAR001', 2.50, 5.00, 100, 20, '2025-12-31', FALSE),
+('Amoxicillin 250mg', 'Amoxicillin', 2, 1, 'AMX001', 15.00, 25.00, 50, 10, '2025-06-30', TRUE),
+('Vitamin C 1000mg', 'Ascorbic Acid', 3, 2, 'VTC001', 8.00, 15.00, 75, 15, '2026-03-31', FALSE),
+('Cough Syrup', 'Dextromethorphan', 4, 2, 'CS001', 12.00, 20.00, 30, 10, '2025-09-30', FALSE),
+('Metformin 500mg', 'Metformin HCl', 5, 3, 'MET001', 18.00, 30.00, 40, 15, '2025-11-30', TRUE);
+
+-- Insert default settings
+INSERT INTO settings (setting_key, setting_value, description) VALUES 
+('pharmacy_name', 'PharmaCare', 'Name of the pharmacy'),
+('pharmacy_address', '123 Main Street, City, State 12345', 'Pharmacy address'),
+('pharmacy_phone', '+1234567890', 'Pharmacy contact number'),
+('pharmacy_email', 'info@pharmacare.com', 'Pharmacy email address'),
+('tax_rate', '18', 'Default tax rate percentage'),
+('currency_symbol', 'Rs', 'Currency symbol'),
+('low_stock_threshold', '10', 'Default low stock alert threshold'),
+('expiry_alert_days', '30', 'Days before expiry to show alert');

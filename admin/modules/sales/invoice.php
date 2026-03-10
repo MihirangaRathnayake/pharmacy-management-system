@@ -26,9 +26,9 @@ try {
     if ($pdo) {
         // Get sale data
         $stmt = $pdo->prepare("
-            SELECT s.*, u.name as customer_name, u.email as customer_email, u.phone as customer_phone, u.address as customer_address
+            SELECT s.*, c.name as customer_name, c.email as customer_email, c.phone as customer_phone, c.address as customer_address
             FROM sales s 
-            LEFT JOIN users u ON s.customer_id = u.id 
+            LEFT JOIN customers c ON s.customer_id = c.id 
             WHERE s.id = ?
         ");
         $stmt->execute([$invoice_id]);
@@ -41,7 +41,7 @@ try {
 
         // Get sale items
         $stmt = $pdo->prepare("
-            SELECT si.*, m.name as medicine_name, m.generic_name, m.manufacturer, m.batch_number, m.expiry_date
+            SELECT si.*, m.name as medicine_name, m.generic_name, m.batch_number as medicine_batch, m.expiry_date as medicine_expiry
             FROM sale_items si 
             JOIN medicines m ON si.medicine_id = m.id 
             WHERE si.sale_id = ?
@@ -56,18 +56,18 @@ try {
 }
 
 // Calculate totals
-$subtotal = 0;
-$total_tax = 0;
-$total_discount = 0;
+$subtotal = $sale['subtotal'] ?? 0;
+$total_tax = $sale['tax_amount'] ?? 0;
+$total_discount = $sale['discount_amount'] ?? 0;
+$grand_total = $sale['total_amount'] ?? 0;
 
-foreach ($sale_items as $item) {
-    $item_total = $item['quantity'] * $item['unit_price'];
-    $subtotal += $item_total;
-    $total_tax += $item['tax_amount'] ?? 0;
-    $total_discount += $item['discount_amount'] ?? 0;
+// If subtotal not stored, calculate from items
+if ($subtotal == 0 && !empty($sale_items)) {
+    foreach ($sale_items as $item) {
+        $subtotal += $item['quantity'] * $item['unit_price'];
+    }
+    $grand_total = $subtotal + $total_tax - $total_discount;
 }
-
-$grand_total = $subtotal + $total_tax - $total_discount;
 
 // Generate invoice number if not exists
 $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0', STR_PAD_LEFT);
@@ -606,6 +606,16 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
                 }
             }
         });
+
+        // Auto-print if print=1 parameter is set
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('print') === '1') {
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    window.print();
+                }, 500);
+            });
+        }
 
         // Add some interactive animations
         document.addEventListener('DOMContentLoaded', function() {
