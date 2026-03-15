@@ -52,23 +52,21 @@ $profileImage = ($user && !empty($user['profile_image']))
         <div class="relative">
           <button class="pc-btn pc-btn-muted dark:text-slate-100" onclick="toggleNotifications()">
             <i class="fas fa-bell"></i>
-            <span id="notificationCount" class="pc-badge pc-badge-danger">2</span>
+            <span id="notificationCount" class="pc-badge pc-badge-danger" style="display:none;">0</span>
           </button>
-          <div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-80 pc-card p-3">
-            <div class="text-sm font-semibold mb-2 text-slate-800 dark:text-slate-100">Notifications</div>
+          <div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-80 pc-card p-3" style="max-height:420px;overflow-y:auto;z-index:1001;">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-sm font-semibold text-slate-800 dark:text-slate-100">Notifications</div>
+              <button onclick="markAllNotificationsRead()" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium" id="markAllReadBtn" style="display:none;">Mark all read</button>
+            </div>
             <div id="notificationsList" class="space-y-2">
-              <div
-                class="rounded-lg border border-slate-200 dark:border-slate-700 p-2 text-sm text-slate-700 dark:text-slate-200">
-                Low stock alerts are available.</div>
-              <div
-                class="rounded-lg border border-slate-200 dark:border-slate-700 p-2 text-sm text-slate-700 dark:text-slate-200">
-                Daily report is ready to export.</div>
+              <div class="p-3 text-center text-sm text-slate-400"><i class="fas fa-spinner fa-spin mr-1"></i> Loading...</div>
             </div>
           </div>
         </div>
         <div class="relative">
           <button
-            class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-100"
+            class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-2 py-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-50/10 text-slate-700 dark:text-slate-100"
             onclick="toggleUserMenu()">
             <img src="<?php echo $profileImage; ?>" alt="Profile" class="h-8 w-8 rounded-full object-cover"
               onerror="this.src='<?php echo url('assets/images/default-avatar.svg'); ?>'">
@@ -78,10 +76,10 @@ $profileImage = ($user && !empty($user['profile_image']))
           </button>
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 pc-card p-2">
             <a href="<?php echo url('modules/profile/index.php'); ?>"
-              class="block rounded-lg px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm text-slate-700 dark:text-slate-100"><i
+              class="block rounded-lg px-3 py-2 hover:bg-emerald-50 dark:hover:bg-emerald-50/10 text-sm text-slate-700 dark:text-slate-100"><i
                 class="fas fa-user mr-2"></i>Profile</a>
             <a href="<?php echo moduleUrl('settings'); ?>"
-              class="block rounded-lg px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm text-slate-700 dark:text-slate-100"><i
+              class="block rounded-lg px-3 py-2 hover:bg-emerald-50 dark:hover:bg-emerald-50/10 text-sm text-slate-700 dark:text-slate-100"><i
                 class="fas fa-gear mr-2"></i>Settings</a>
             <a href="<?php echo url('auth/logout.php'); ?>"
               class="block rounded-lg px-3 py-2 hover:bg-red-50 text-sm text-red-600"><i
@@ -113,12 +111,18 @@ $profileImage = ($user && !empty($user['profile_image']))
   </div>
 </nav>
 <script>
+  var notificationsApiUrl = '<?php echo url("api/notifications.php"); ?>';
+
   function toggleUserMenu() {
     document.getElementById('userDropdown').classList.toggle('hidden');
   }
 
   function toggleNotifications() {
-    document.getElementById('notificationsDropdown').classList.toggle('hidden');
+    var dd = document.getElementById('notificationsDropdown');
+    dd.classList.toggle('hidden');
+    if (!dd.classList.contains('hidden')) {
+      loadNotifications();
+    }
   }
 
   function toggleMobileMenu() {
@@ -135,6 +139,7 @@ $profileImage = ($user && !empty($user['profile_image']))
       document.documentElement.setAttribute('data-theme', next);
     }
   }
+
   document.addEventListener('click', function(event) {
     if (!event.target.closest('.relative')) {
       const u = document.getElementById('userDropdown');
@@ -142,5 +147,173 @@ $profileImage = ($user && !empty($user['profile_image']))
       if (u) u.classList.add('hidden');
       if (n) n.classList.add('hidden');
     }
+  });
+
+  // --- Notification System ---
+  function escapeNotifHtml(str) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
+  }
+
+  function getNotifIcon(type) {
+    switch (type) {
+      case 'warning':
+        return '<i class="fas fa-exclamation-triangle text-amber-500"></i>';
+      case 'error':
+        return '<i class="fas fa-times-circle text-red-500"></i>';
+      case 'success':
+        return '<i class="fas fa-check-circle text-emerald-500"></i>';
+      default:
+        return '<i class="fas fa-info-circle text-blue-500"></i>';
+    }
+  }
+
+  function timeAgo(dateStr) {
+    var now = new Date();
+    var then = new Date(dateStr);
+    var diff = Math.floor((now - then) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    return then.toLocaleDateString();
+  }
+
+  function loadNotifications() {
+    fetch(notificationsApiUrl + '?action=fetch', {
+        credentials: 'same-origin'
+      })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data) {
+        if (!data.success) {
+          document.getElementById('notificationsList').innerHTML =
+            '<div class="p-3 text-center text-sm text-slate-400"><i class="fas fa-bell-slash text-2xl mb-2 block opacity-50"></i>' + (data.message || 'Could not load notifications') + '</div>';
+          return;
+        }
+        updateNotificationBadge(data.unread_count);
+        renderNotifications(data.notifications);
+      })
+      .catch(function(err) {
+        console.error('Notification load error:', err);
+        document.getElementById('notificationsList').innerHTML =
+          '<div class="p-3 text-center text-sm text-red-400"><i class="fas fa-exclamation-circle mr-1"></i> Failed to load</div>';
+      });
+  }
+
+  function updateNotificationBadge(count) {
+    var badge = document.getElementById('notificationCount');
+    var markAllBtn = document.getElementById('markAllReadBtn');
+    if (count > 0) {
+      badge.textContent = count > 99 ? '99+' : count;
+      badge.style.display = '';
+      if (markAllBtn) markAllBtn.style.display = '';
+    } else {
+      badge.style.display = 'none';
+      if (markAllBtn) markAllBtn.style.display = 'none';
+    }
+  }
+
+  function renderNotifications(notifications) {
+    var list = document.getElementById('notificationsList');
+    if (!notifications || !notifications.length) {
+      list.innerHTML = '<div class="p-4 text-center text-sm text-slate-400"><i class="fas fa-bell-slash text-2xl mb-2 block opacity-50"></i>No notifications</div>';
+      return;
+    }
+    list.innerHTML = notifications.map(function(n) {
+      var readClass = n.is_read == 1 ? 'opacity-60' : '';
+      var unreadDot = n.is_read == 0 ? '<span class="w-2 h-2 bg-emerald-500 rounded-full flex-shrink-0"></span>' : '';
+      return '<div class="rounded-lg border border-slate-200 dark:border-slate-700 p-2.5 text-sm cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-50/10 transition-all ' + readClass + '" onclick="markNotificationRead(' + n.id + ', this)">' +
+        '<div class="flex items-start gap-2">' +
+        '<div class="mt-0.5">' + getNotifIcon(n.type) + '</div>' +
+        '<div class="flex-1 min-w-0">' +
+        '<div class="font-medium text-slate-800 dark:text-slate-100 text-xs">' + escapeNotifHtml(n.title) + '</div>' +
+        '<div class="text-slate-600 dark:text-slate-300 text-xs mt-0.5">' + escapeNotifHtml(n.message) + '</div>' +
+        '<div class="text-xs text-slate-400 mt-1">' + timeAgo(n.created_at) + '</div>' +
+        '</div>' +
+        unreadDot +
+        '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function markNotificationRead(id, el) {
+    if (el) el.classList.add('opacity-60');
+    var dot = el ? el.querySelector('.bg-emerald-500') : null;
+    if (dot) dot.remove();
+
+    fetch(notificationsApiUrl + '?action=mark_read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: id
+        })
+      }).then(function(r) {
+        return r.json();
+      })
+      .then(function() {
+        // Update badge count
+        var badge = document.getElementById('notificationCount');
+        var current = parseInt(badge.textContent) || 0;
+        if (current > 0) updateNotificationBadge(current - 1);
+      });
+  }
+
+  function markAllNotificationsRead() {
+    fetch(notificationsApiUrl + '?action=mark_all_read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function(r) {
+        return r.json();
+      })
+      .then(function(data) {
+        if (data.success) {
+          updateNotificationBadge(0);
+          document.querySelectorAll('#notificationsList > div').forEach(function(el) {
+            el.classList.add('opacity-60');
+            var dot = el.querySelector('.bg-emerald-500');
+            if (dot) dot.remove();
+          });
+          if (window.PCUI) window.PCUI.showToast('All notifications marked as read', 'success');
+        }
+      });
+  }
+
+  // Auto-generate notifications and load badge on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch(notificationsApiUrl + '?action=generate', {
+        credentials: 'same-origin'
+      }).then(function() {
+        return fetch(notificationsApiUrl + '?action=fetch', {
+          credentials: 'same-origin'
+        });
+      }).then(function(r) {
+        return r.json();
+      })
+      .then(function(data) {
+        if (data.success) updateNotificationBadge(data.unread_count);
+      }).catch(function(err) {
+        console.error('Notification init error:', err);
+      });
+
+    // Refresh notifications every 60 seconds
+    setInterval(function() {
+      fetch(notificationsApiUrl + '?action=fetch', {
+          credentials: 'same-origin'
+        })
+        .then(function(r) {
+          return r.json();
+        })
+        .then(function(data) {
+          if (data.success) updateNotificationBadge(data.unread_count);
+        }).catch(function() {});
+    }, 60000);
   });
 </script>

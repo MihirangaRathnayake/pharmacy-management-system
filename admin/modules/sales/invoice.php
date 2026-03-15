@@ -514,6 +514,7 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
     <script src="../../assets/js/admin-icons-fix.js"></script>
 
     <script>
@@ -525,15 +526,34 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
         // Download PDF functionality
         function downloadPDF() {
             showLoading();
-
-            // Simulate PDF generation
-            setTimeout(() => {
+            var invoiceEl = document.querySelector('.invoice-container');
+            var filename = 'Invoice_<?php echo preg_replace("/[^A-Za-z0-9_-]/", "_", $invoice_number); ?>.pdf';
+            var opt = {
+                margin: [0.3, 0.3, 0.3, 0.3],
+                filename: filename,
+                image: {
+                    type: 'jpeg',
+                    quality: 0.98
+                },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: {
+                    unit: 'in',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+            html2pdf().set(opt).from(invoiceEl).save().then(function() {
                 hideLoading();
                 showSuccess('PDF downloaded successfully!');
-
-                // In a real implementation, you would call a server endpoint
-                // window.location.href = 'generate_pdf.php?id=<?php echo $invoice_id; ?>';
-            }, 2000);
+            }).catch(function(err) {
+                hideLoading();
+                alert('PDF generation failed. Please try printing instead (Ctrl+P).');
+                console.error('PDF error:', err);
+            });
         }
 
         // Email functionality

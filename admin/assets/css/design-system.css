@@ -55,7 +55,8 @@ body::before {
 }
 
 @keyframes gradientShift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -78,7 +79,7 @@ body::before {
 .pc-page-header {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  border:1px solid rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.08);
   border-radius: 1.5rem;
   padding: 1.75rem;
   margin-bottom: 2rem;
@@ -138,7 +139,7 @@ html[data-theme="dark"] .pc-card {
 }
 
 .pc-stat-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -165,7 +166,11 @@ html[data-theme="dark"] .pc-card {
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1),
+    rgba(59, 130, 246, 0.1)
+  );
   color: var(--pc-primary);
   font-size: 1.75rem;
 }
@@ -243,7 +248,7 @@ html[data-theme="dark"] .pc-card {
 }
 
 .pc-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -252,7 +257,9 @@ html[data-theme="dark"] .pc-card {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   transform: translate(-50%, -50%);
-  transition: width 0.5s, height 0.5s;
+  transition:
+    width 0.5s,
+    height 0.5s;
 }
 
 .pc-btn:active::before {
@@ -566,6 +573,23 @@ nav .pc-card {
   transition: all 0.2s ease;
 }
 
+/* Force all notification text to be dark and readable */
+#notificationsList div,
+#notificationsList span,
+#notificationsList p {
+  color: #334155 !important;
+}
+
+#notificationsList .font-medium {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+#notificationsList .text-xs.mt-1,
+#notificationsList .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
 #notificationsList > div:hover {
   background: rgba(16, 185, 129, 0.05) !important;
   border-color: rgba(16, 185, 129, 0.25) !important;
@@ -666,6 +690,17 @@ nav .md\:hidden {
 
 #userDropdown a.text-red-600:hover {
   background: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* Force light hover for profile button and all nav interactive elements */
+nav .relative > button:hover {
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+nav .relative .pc-card a:hover,
+nav .relative .pc-card div:hover {
+  background: rgba(16, 185, 129, 0.08) !important;
 }
 
 /* Notification Badge Enhancement */

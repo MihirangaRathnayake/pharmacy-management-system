@@ -31,6 +31,47 @@ if (!$user) {
     header('Location: auth/login.php?message=access_denied');
     exit();
 }
+
+// Fetch dashboard statistics from database
+try {
+    // Today's Sales
+    $todaySales = $pdo->query("SELECT COALESCE(SUM(total_amount), 0) as total FROM sales WHERE DATE(sale_date) = CURDATE()")->fetch()['total'];
+
+    // Low Stock Items
+    $lowStockCount = $pdo->query("SELECT COUNT(*) as count FROM medicines WHERE stock_quantity <= min_stock_level AND status = 'active'")->fetch()['count'];
+
+    // Pending Orders (prescriptions pending)
+    $pendingOrders = $pdo->query("SELECT COUNT(*) as count FROM prescriptions WHERE status = 'pending'")->fetch()['count'];
+
+    // Total Customers
+    $totalCustomers = $pdo->query("SELECT COUNT(*) as count FROM customers WHERE status = 'active'")->fetch()['count'];
+
+    // Recent Sales (last 5)
+    $recentSales = $pdo->query("
+        SELECT s.invoice_number, s.total_amount, s.sale_date, s.payment_method,
+               COALESCE(c.name, 'Walk-in Customer') as customer_name
+        FROM sales s
+        LEFT JOIN customers c ON s.customer_id = c.id
+        ORDER BY s.sale_date DESC
+        LIMIT 5
+    ")->fetchAll();
+
+    // Stock Alerts (low stock medicines)
+    $stockAlerts = $pdo->query("
+        SELECT name, stock_quantity, min_stock_level
+        FROM medicines
+        WHERE stock_quantity <= min_stock_level AND status = 'active'
+        ORDER BY stock_quantity ASC
+        LIMIT 5
+    ")->fetchAll();
+} catch (Exception $e) {
+    $todaySales = 0;
+    $lowStockCount = 0;
+    $pendingOrders = 0;
+    $totalCustomers = 0;
+    $recentSales = [];
+    $stockAlerts = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -155,35 +196,35 @@ if (!$user) {
             color: #0f172a !important;
         }
 
-        #notificationsList > div {
+        #notificationsList>div {
             background: rgba(249, 250, 251, 0.8) !important;
             border-color: rgba(16, 185, 129, 0.15) !important;
             color: #334155 !important;
             transition: all 0.2s ease;
         }
 
-        #notificationsList > div:hover {
+        #notificationsList>div:hover {
             background: rgba(16, 185, 129, 0.05) !important;
             border-color: rgba(16, 185, 129, 0.25) !important;
             transform: translateX(4px);
         }
 
         /* User Profile Button Enhancement */
-        nav .flex.items-center.gap-2 > button {
+        nav .flex.items-center.gap-2>button {
             background: rgba(255, 255, 255, 0.9) !important;
             border-color: rgba(16, 185, 129, 0.15) !important;
             transition: all 0.3s ease;
         }
 
-        nav .flex.items-center.gap-2 > button:hover {
+        nav .flex.items-center.gap-2>button:hover {
             background: rgba(16, 185, 129, 0.05) !important;
             border-color: rgba(16, 185, 129, 0.25) !important;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1) !important;
         }
 
         /* All possible selectors for user name text */
-        nav .flex.items-center.gap-2 > button span,
-        nav .flex.items-center.gap-2 > button span.hidden.lg\:inline,
+        nav .flex.items-center.gap-2>button span,
+        nav .flex.items-center.gap-2>button span.hidden.lg\:inline,
         nav button[onclick="toggleUserMenu()"] span,
         nav button[onclick="toggleUserMenu()"] span.text-sm,
         nav .relative button span {
@@ -192,8 +233,8 @@ if (!$user) {
         }
 
         /* Override dark mode text color */
-        nav .flex.items-center.gap-2 > button.text-slate-700,
-        nav .flex.items-center.gap-2 > button.dark\:text-slate-100 {
+        nav .flex.items-center.gap-2>button.text-slate-700,
+        nav .flex.items-center.gap-2>button.dark\:text-slate-100 {
             color: #1e293b !important;
         }
 
@@ -207,7 +248,7 @@ if (!$user) {
             color: #64748b !important;
         }
 
-        nav .flex.items-center.gap-2 > button .fa-chevron-down {
+        nav .flex.items-center.gap-2>button .fa-chevron-down {
             color: #64748b !important;
         }
 
@@ -218,7 +259,7 @@ if (!$user) {
             transition: all 0.3s ease;
         }
 
-        nav .flex.items-center.gap-2 > button:hover img[alt="Profile"] {
+        nav .flex.items-center.gap-2>button:hover img[alt="Profile"] {
             border-color: rgba(16, 185, 129, 0.4);
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
         }
@@ -276,6 +317,7 @@ if (!$user) {
                 opacity: 0;
                 transform: translateY(-10px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -298,10 +340,13 @@ if (!$user) {
         }
 
         @keyframes badgePulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
             }
+
             50% {
                 transform: scale(1.05);
                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
@@ -498,7 +543,7 @@ if (!$user) {
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Today's Sales</p>
-                        <p class="text-2xl font-bold text-gray-900" id="todaySales">Rs 0</p>
+                        <p class="text-2xl font-bold text-gray-900" id="todaySales">Rs <?php echo number_format($todaySales, 2); ?></p>
                         <p class="pc-trend-up"><i class="fas fa-arrow-trend-up"></i> +6.1% vs yesterday</p>
                     </div>
                     <div class="icon">
@@ -511,7 +556,7 @@ if (!$user) {
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Low Stock Items</p>
-                        <p class="text-2xl font-bold text-gray-900" id="lowStockCount">0</p>
+                        <p class="text-2xl font-bold text-gray-900" id="lowStockCount"><?php echo $lowStockCount; ?></p>
                         <p class="pc-trend-down"><i class="fas fa-circle-exclamation"></i> monitor urgently</p>
                     </div>
                     <div class="icon">
@@ -524,7 +569,7 @@ if (!$user) {
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Pending Orders</p>
-                        <p class="text-2xl font-bold text-gray-900" id="pendingOrders">0</p>
+                        <p class="text-2xl font-bold text-gray-900" id="pendingOrders"><?php echo $pendingOrders; ?></p>
                         <p class="text-xs text-slate-500">Workflow queue</p>
                     </div>
                     <div class="icon">
@@ -537,7 +582,7 @@ if (!$user) {
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total Customers</p>
-                        <p class="text-2xl font-bold text-gray-900" id="totalCustomers">0</p>
+                        <p class="text-2xl font-bold text-gray-900" id="totalCustomers"><?php echo $totalCustomers; ?></p>
                         <p class="pc-trend-up"><i class="fas fa-user-plus"></i> healthy growth</p>
                     </div>
                     <div class="icon">
@@ -595,6 +640,13 @@ if (!$user) {
     </div>
 
     <script src="assets/js/admin-icons-fix.js"></script>
+    <script>
+        // Dashboard data from database
+        window.dashboardData = {
+            recentSales: <?php echo json_encode($recentSales); ?>,
+            stockAlerts: <?php echo json_encode($stockAlerts); ?>
+        };
+    </script>
     <script src="assets/js/dashboard.js"></script>
 
     <script>
@@ -852,7 +904,9 @@ if (!$user) {
                             opacity: [0, 1],
                             translateY: [-10, 0],
                             duration: 500,
-                            delay: anime.stagger(50, { start: 500 }),
+                            delay: anime.stagger(50, {
+                                start: 500
+                            }),
                             easing: 'easeOutQuad'
                         });
                     }
