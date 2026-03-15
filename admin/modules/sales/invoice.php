@@ -315,12 +315,6 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
                                     <p class="text-green-100">Your Trusted Pharmacy</p>
                                 </div>
                             </div>
-                            <div class="space-y-1 text-green-100">
-                                <p><i class="fas fa-map-marker-alt mr-2"></i>123 Medical Street, Healthcare City</p>
-                                <p><i class="fas fa-phone mr-2"></i>+1 (555) 123-4567</p>
-                                <p><i class="fas fa-envelope mr-2"></i>info@pharmacare.com</p>
-                                <p><i class="fas fa-globe mr-2"></i>www.pharmacare.com</p>
-                            </div>
                         </div>
 
                         <div class="text-right">
