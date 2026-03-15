@@ -274,7 +274,7 @@ try {
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
 
-        /* PharmaCare Brand Text */
+        /* New Gampaha Pharmacy Brand Text */
         nav .font-bold.leading-tight {
             color: #0f172a !important;
         }

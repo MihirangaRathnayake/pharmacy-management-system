@@ -23,7 +23,7 @@ function getEmailConfig()
         'smtp_username' => getenv('SMTP_USERNAME') ?: '',
         'smtp_password' => getenv('SMTP_PASSWORD') ?: '',
         'from_email' => getenv('MAIL_FROM_EMAIL') ?: 'noreply@pharmacare.com',
-        'from_name' => getenv('MAIL_FROM_NAME') ?: 'PharmaCare',
+        'from_name' => getenv('MAIL_FROM_NAME') ?: 'New Gampaha Pharmacy',
     ];
 }
 
@@ -120,7 +120,7 @@ function sendEmail($to, $subject, $message, $fromName = null, $fromEmail = null)
  */
 function sendPasswordResetCode($to, $name, $code)
 {
-    $subject = "Password Reset Code - PharmaCare";
+    $subject = "Password Reset Code - New Gampaha Pharmacy";
 
     $message = "
     <!DOCTYPE html>
@@ -196,7 +196,7 @@ function sendPasswordResetCode($to, $name, $code)
             </div>
             <div class='content'>
                 <h2>Hello " . htmlspecialchars($name) . ",</h2>
-                <p>We received a request to reset your password for your PharmaCare account.</p>
+                <p>We received a request to reset your password for your New Gampaha Pharmacy account.</p>
                 <p>Please use the following verification code to complete your password reset:</p>
 
                 <div class='code-box'>
@@ -217,7 +217,7 @@ function sendPasswordResetCode($to, $name, $code)
                 </p>
             </div>
             <div class='footer'>
-                <p>© " . date('Y') . " PharmaCare Pharmacy Management System</p>
+                <p>© " . date('Y') . " New Gampaha Pharmacy Management System</p>
                 <p>This is an automated email. Please do not reply.</p>
             </div>
         </div>
@@ -238,7 +238,7 @@ function sendPasswordResetCode($to, $name, $code)
  */
 function sendPasswordResetLink($to, $name, $resetLink)
 {
-    $subject = "Password Reset Link - PharmaCare";
+    $subject = "Password Reset Link - New Gampaha Pharmacy";
 
     $message = "
     <!DOCTYPE html>
@@ -313,7 +313,7 @@ function sendPasswordResetLink($to, $name, $resetLink)
             </div>
             <div class='content'>
                 <h2>Hello " . htmlspecialchars($name) . ",</h2>
-                <p>We received a request to reset your password for your PharmaCare account.</p>
+                <p>We received a request to reset your password for your New Gampaha Pharmacy account.</p>
                 <p>Click the button below to reset your password:</p>
 
                 <div style='text-align: center; margin: 30px 0;'>
@@ -335,7 +335,7 @@ function sendPasswordResetLink($to, $name, $resetLink)
                 </p>
             </div>
             <div class='footer'>
-                <p>© " . date('Y') . " PharmaCare Pharmacy Management System</p>
+                <p>© " . date('Y') . " New Gampaha Pharmacy Management System</p>
                 <p>This is an automated email. Please do not reply.</p>
             </div>
         </div>
@@ -355,13 +355,13 @@ function sendPasswordResetLink($to, $name, $resetLink)
  */
 function testEmailConfiguration($to)
 {
-    $subject = "Test Email - PharmaCare";
+    $subject = "Test Email - New Gampaha Pharmacy";
     $message = "
     <!DOCTYPE html>
     <html>
     <body style='font-family: Arial, sans-serif; padding: 20px;'>
         <h2 style='color: #10b981;'>Email Configuration Test</h2>
-        <p>This is a test email from your PharmaCare Pharmacy Management System.</p>
+        <p>This is a test email from your New Gampaha Pharmacy Management System.</p>
         <p>If you received this email, your email configuration is working correctly!</p>
         <p><strong>Time:</strong> " . date('Y-m-d H:i:s') . "</p>
     </body>

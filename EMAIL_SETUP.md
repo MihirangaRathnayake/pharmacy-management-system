@@ -34,7 +34,7 @@ SMTP_ENCRYPTION=tls
 SMTP_USERNAME=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 MAIL_FROM_EMAIL=noreply@pharmacare.com
-MAIL_FROM_NAME=PharmaCare
+MAIL_FROM_NAME=New Gampaha Pharmacy
 ```
 
 ### Step 3: Get SMTP Credentials
@@ -153,7 +153,7 @@ You can test if email sending works by using the password reset feature:
 The system includes professional HTML email templates with:
 
 - Responsive design
-- PharmaCare branding
+- New Gampaha Pharmacy branding
 - Clear code display with large monospace font
 - Security tips and expiration notice
 - Mobile-friendly layout

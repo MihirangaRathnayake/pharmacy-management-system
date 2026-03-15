@@ -76,7 +76,7 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
 <html lang="en" data-theme="<?php echo getThemeClass(); ?>">
 
 <head>
-    <title>Invoice #<?php echo htmlspecialchars($invoice_number); ?> - PharmaCare</title>
+    <title>Invoice #<?php echo htmlspecialchars($invoice_number); ?> - New Gampaha Pharmacy</title>
     <?php include '../../includes/head.php'; ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -311,7 +311,7 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
                                     <i class="fas fa-plus-circle text-2xl"></i>
                                 </div>
                                 <div>
-                                    <h1 class="text-3xl font-bold">PharmaCare</h1>
+                                    <h1 class="text-3xl font-bold">New Gampaha Pharmacy</h1>
                                     <p class="text-green-100">Your Trusted Pharmacy</p>
                                 </div>
                             </div>
@@ -475,7 +475,7 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
                         <div class="text-right">
                             <h4 class="font-bold text-gray-900 mb-3">Thank You!</h4>
                             <p class="text-sm text-gray-600 mb-4">
-                                We appreciate your business and trust in PharmaCare.
+                                We appreciate your business and trust in New Gampaha Pharmacy.
                                 For any queries, please contact us at the above details.
                             </p>
                             <div class="flex justify-end space-x-4">
@@ -578,7 +578,7 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
             if (navigator.share) {
                 navigator.share({
                     title: 'Invoice #<?php echo htmlspecialchars($invoice_number); ?>',
-                    text: 'PharmaCare Invoice',
+                    text: 'New Gampaha Pharmacy Invoice',
                     url: window.location.href
                 });
             } else {

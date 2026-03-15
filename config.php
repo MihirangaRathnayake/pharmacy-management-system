@@ -38,5 +38,5 @@ define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 
 // Application Settings
-define('APP_NAME', 'PharmaCare');
+define('APP_NAME', 'New Gampaha Pharmacy');
 define('APP_VERSION', '1.0.0');

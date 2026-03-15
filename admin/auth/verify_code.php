@@ -272,7 +272,7 @@ if (isset($_POST['resend'])) {
                 <div class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-sm">
                     <i class="fas fa-pills text-white text-2xl"></i>
                 </div>
-                <span class="text-3xl font-bold text-slate-800">PharmaCare</span>
+                <span class="text-3xl font-bold text-slate-800">New Gampaha Pharmacy</span>
             </div>
             <p class="text-slate-500 text-sm">Pharmacy Management System</p>
         </div>

@@ -22,7 +22,7 @@ A complete email-based password reset system with 6-digit verification codes has
   - PHPMailer SMTP support with automatic fallback
   - Configuration via environment variables
   - Beautiful HTML email templates
-  - Professional PharmaCare branding
+  - Professional New Gampaha Pharmacy branding
   - Gmail, Office 365, SendGrid, Mailgun, AWS SES support
   - Development mode fallback (shows code on screen)
 
@@ -143,7 +143,7 @@ Comprehensive guide covering:
 
 ### Email Template Features
 
-- Gradient header with PharmaCare branding
+- Gradient header with New Gampaha Pharmacy branding
 - Large, centered verification code (48px, monospace)
 - Dashed border code box with pastel gradient
 - Security tips and best practices
@@ -269,7 +269,7 @@ SMTP_ENCRYPTION=tls
 SMTP_USERNAME=username
 SMTP_PASSWORD=password
 MAIL_FROM_EMAIL=noreply@pharmacare.com
-MAIL_FROM_NAME=PharmaCare
+MAIL_FROM_NAME=New Gampaha Pharmacy
 ```
 
 ## Summary

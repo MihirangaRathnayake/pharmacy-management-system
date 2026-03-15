@@ -41,7 +41,7 @@ define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 
 // Application settings
-define('APP_NAME', 'PharmaCare');
+define('APP_NAME', 'New Gampaha Pharmacy');
 define('APP_VERSION', '1.0.0');
 define('APP_URL', 'http://localhost/pharmacy-management-system');
 
@@ -71,7 +71,7 @@ define('SMTP_PORT', getenv('SMTP_PORT') ?: 587);
 define('SMTP_USERNAME', getenv('SMTP_USERNAME') ?: '');
 define('SMTP_PASSWORD', getenv('SMTP_PASSWORD') ?: '');
 define('MAIL_FROM_EMAIL', getenv('MAIL_FROM_EMAIL') ?: 'noreply@pharmacare.com');
-define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: 'PharmaCare');
+define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: 'New Gampaha Pharmacy');
 
 // Timezone
 date_default_timezone_set('Asia/Kolkata');

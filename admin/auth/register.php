@@ -155,7 +155,7 @@ if ($_POST) {
                 <div class="w-14 h-14 bg-gradient-to-br from-purple-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-sm">
                     <i class="fas fa-pills text-white text-2xl"></i>
                 </div>
-                <span class="text-3xl font-bold text-slate-800">PharmaCare</span>
+                <span class="text-3xl font-bold text-slate-800">New Gampaha Pharmacy</span>
             </div>
             <p class="text-slate-500 text-sm">Create Admin Account</p>
         </div>

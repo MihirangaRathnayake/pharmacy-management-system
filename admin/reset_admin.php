@@ -50,7 +50,7 @@ if ($pdo) {
             <div class="text-center mb-8">
                 <div class="inline-flex items-center space-x-2 mb-4">
                     <i class="fas fa-pills text-red-600 text-4xl"></i>
-                    <span class="text-3xl font-bold text-gray-800">PharmaCare</span>
+                    <span class="text-3xl font-bold text-gray-800">New Gampaha Pharmacy</span>
                 </div>
                 <p class="text-gray-600">Reset Admin Credentials</p>
             </div>

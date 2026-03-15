@@ -264,7 +264,7 @@ INSERT INTO medicines (name, generic_name, category_id, supplier_id, batch_numbe
 
 -- Insert default settings
 INSERT INTO settings (setting_key, setting_value, description) VALUES 
-('pharmacy_name', 'PharmaCare', 'Name of the pharmacy'),
+('pharmacy_name', 'New Gampaha Pharmacy', 'Name of the pharmacy'),
 ('pharmacy_address', '123 Main Street, City, State 12345', 'Pharmacy address'),
 ('pharmacy_phone', '+1234567890', 'Pharmacy contact number'),
 ('pharmacy_email', 'info@pharmacare.com', 'Pharmacy email address'),
