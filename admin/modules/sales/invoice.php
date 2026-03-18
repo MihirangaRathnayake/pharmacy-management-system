@@ -553,18 +553,35 @@ $invoice_number = $sale['invoice_number'] ?? 'INV-' . str_pad($invoice_id, 6, '0
         // Email functionality
         function emailInvoice() {
             const email = prompt('Enter email address:');
-            if (email) {
-                showLoading();
-
-                // Simulate email sending
-                setTimeout(() => {
-                    hideLoading();
-                    showSuccess(`Invoice emailed to ${email} successfully!`);
-
-                    // In a real implementation, you would call a server endpoint
-                    // fetch('email_invoice.php', { method: 'POST', body: JSON.stringify({id: <?php echo $invoice_id; ?>, email: email}) });
-                }, 2000);
+            if (!email) {
+                return;
             }
+
+            showLoading();
+
+            fetch('email_invoice.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: <?php echo (int)$invoice_id; ?>,
+                        email: email.trim()
+                    })
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    hideLoading();
+                    if (data.success) {
+                        showSuccess(data.message || `Invoice emailed to ${email} successfully!`);
+                        return;
+                    }
+                    alert(data.message || 'Failed to send invoice email.');
+                })
+                .catch(() => {
+                    hideLoading();
+                    alert('Failed to send invoice email. Please check SMTP settings and try again.');
+                });
         }
 
         // Share functionality

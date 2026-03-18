@@ -15,8 +15,11 @@ use PHPMailer\PHPMailer\Exception;
  */
 function getEmailConfig()
 {
+    $smtpEnabledRaw = getenv('SMTP_ENABLED');
+    $smtpEnabled = filter_var($smtpEnabledRaw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
     return [
-        'use_smtp' => getenv('SMTP_ENABLED') ?: false, // Set to true to enable SMTP
+        'use_smtp' => $smtpEnabled === true, // Set to true to enable SMTP
         'smtp_host' => getenv('SMTP_HOST') ?: 'smtp.gmail.com',
         'smtp_port' => getenv('SMTP_PORT') ?: 587,
         'smtp_encryption' => getenv('SMTP_ENCRYPTION') ?: 'tls', // 'tls' or 'ssl'
@@ -42,6 +45,7 @@ function sendEmail($to, $subject, $message, $fromName = null, $fromEmail = null)
     $config = getEmailConfig();
     $fromName = $fromName ?: $config['from_name'];
     $fromEmail = $fromEmail ?: $config['from_email'];
+    $mail = null;
 
     // Try PHPMailer if SMTP is enabled and configured
     if ($config['use_smtp'] && !empty($config['smtp_username']) && !empty($config['smtp_password'])) {
@@ -85,7 +89,8 @@ function sendEmail($to, $subject, $message, $fromName = null, $fromEmail = null)
                 return $success;
             }
         } catch (Exception $e) {
-            error_log("PHPMailer Error: {$mail->ErrorInfo}");
+            $errorInfo = ($mail instanceof PHPMailer && !empty($mail->ErrorInfo)) ? $mail->ErrorInfo : $e->getMessage();
+            error_log("PHPMailer Error: {$errorInfo}");
             // Fall through to PHP mail() as fallback
         }
     }
