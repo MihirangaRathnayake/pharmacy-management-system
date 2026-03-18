@@ -41,35 +41,51 @@ function renderThemeScript() {
     $theme = getUserTheme();
     ?>
     <script>
-        // Apply theme immediately to prevent flash
+        // Resolve theme with this priority:
+        // 1) Browser-stored value from user toggle
+        // 2) DB preference
+        // 3) Light default
         (function() {
-            const theme = '<?php echo $theme; ?>';
+            const dbTheme = '<?php echo $theme; ?>';
             const html = document.documentElement;
+            const storedTheme = localStorage.getItem('theme') || localStorage.getItem('pcTheme') || localStorage.getItem('userTheme');
+            const requestedTheme = storedTheme || dbTheme || 'light';
+            const resolvedTheme = requestedTheme === 'auto'
+                ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                : requestedTheme;
             
-            if (theme === 'auto') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-            } else {
-                html.setAttribute('data-theme', theme);
-            }
+            html.setAttribute('data-theme', resolvedTheme);
+            html.classList.toggle('dark', resolvedTheme === 'dark');
             
-            // Store in localStorage for client-side access
-            localStorage.setItem('userTheme', theme);
+            // Keep all keys synced to the chosen preference, without overwriting
+            // a user-selected local theme with DB defaults on every page load.
+            localStorage.setItem('theme', requestedTheme);
+            localStorage.setItem('pcTheme', requestedTheme);
+            localStorage.setItem('userTheme', requestedTheme);
         })();
         
-        // Listen for system theme changes if user has auto mode
-        if (window.matchMedia && '<?php echo $theme; ?>' === 'auto') {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        // Listen for system theme changes only when preference is auto.
+        if (window.matchMedia) {
+            const media = window.matchMedia('(prefers-color-scheme: dark)');
+            const handler = function(e) {
+                const currentPreference = localStorage.getItem('theme') || localStorage.getItem('pcTheme') || localStorage.getItem('userTheme') || '<?php echo $theme; ?>';
+                if (currentPreference !== 'auto') return;
                 document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
-            });
+                document.documentElement.classList.toggle('dark', e.matches);
+            };
+            if (typeof media.addEventListener === 'function') {
+                media.addEventListener('change', handler);
+            } else if (typeof media.addListener === 'function') {
+                media.addListener(handler);
+            }
         }
     </script>
     <?php
 }
 
 function getThemeCSS() {
-    // Use absolute path from web root
-    return '<link rel="stylesheet" href="/pharmacy-management-system/assets/css/theme.css">';
+    // Use admin design system path (contains all data-theme styles).
+    return '<link rel="stylesheet" href="/pharmacy-management-system/admin/assets/css/design-system.css">';
 }
 
 // Function to include theme assets in pages

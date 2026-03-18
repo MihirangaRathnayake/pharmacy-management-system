@@ -501,10 +501,17 @@ try {
                 });
             });
             
-            // Initialize theme
-            const currentTheme = document.querySelector('input[name="theme"]:checked')?.value || 'light';
-            applyTheme(currentTheme);
-            updateThemeCards(currentTheme);
+            // Initialize theme from stored preference first (prevents resetting user toggle).
+            const storedTheme = localStorage.getItem('theme') || localStorage.getItem('pcTheme') || localStorage.getItem('userTheme');
+            const dbTheme = document.querySelector('input[name="theme"]:checked')?.value || 'light';
+            const initialTheme = storedTheme || dbTheme;
+
+            // Keep radio UI in sync with the active preference.
+            const matchingInput = document.querySelector(`input[name="theme"][value="${initialTheme}"]`);
+            if (matchingInput) matchingInput.checked = true;
+
+            applyTheme(initialTheme);
+            updateThemeCards(initialTheme);
         });
         
         function updateThemeCards(selectedTheme) {
@@ -520,14 +527,20 @@ try {
         
         function applyTheme(theme) {
             const html = document.documentElement;
+            const requestedTheme = theme || 'light';
             
-            if (theme === 'auto') {
+            if (requestedTheme === 'auto') {
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 theme = prefersDark ? 'dark' : 'light';
+            } else {
+                theme = requestedTheme;
             }
             
             html.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
+            html.classList.toggle('dark', theme === 'dark');
+            localStorage.setItem('theme', requestedTheme);
+            localStorage.setItem('pcTheme', requestedTheme);
+            localStorage.setItem('userTheme', requestedTheme);
         }
     </script>
     

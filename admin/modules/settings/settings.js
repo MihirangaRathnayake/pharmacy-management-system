@@ -118,7 +118,7 @@ function updateThemeCards(selectedTheme) {
 }
 
 function getCurrentTheme() {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem('theme') || localStorage.getItem('pcTheme') || localStorage.getItem('userTheme');
     if (savedTheme) return savedTheme;
     
     const themeInput = document.querySelector('input[name="theme"]:checked');
@@ -127,14 +127,20 @@ function getCurrentTheme() {
 
 function applyTheme(theme) {
     const html = document.documentElement;
+    const requestedTheme = theme || 'light';
     
-    if (theme === 'auto') {
+    if (requestedTheme === 'auto') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         theme = prefersDark ? 'dark' : 'light';
+    } else {
+        theme = requestedTheme;
     }
     
     html.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    html.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', requestedTheme);
+    localStorage.setItem('pcTheme', requestedTheme);
+    localStorage.setItem('userTheme', requestedTheme);
     
     // Update navbar if it exists
     updateNavbarTheme(theme);

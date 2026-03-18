@@ -109,18 +109,43 @@
 
   function applyTheme(theme) {
     const html = document.documentElement;
-    const resolved = theme === 'auto'
+    const requested = theme || 'light';
+    const resolved = requested === 'auto'
       ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : theme;
+      : requested;
     html.setAttribute('data-theme', resolved);
-    localStorage.setItem('pcTheme', theme || resolved);
+    html.classList.toggle('dark', resolved === 'dark');
+    localStorage.setItem('pcTheme', requested);
+    localStorage.setItem('theme', requested);
+    localStorage.setItem('userTheme', requested);
     const icon = document.getElementById('themeIcon');
     if (icon) icon.className = 'fas ' + (resolved === 'dark' ? 'fa-sun' : 'fa-moon');
+    document.dispatchEvent(new CustomEvent('pc:theme-change', { detail: { requested, resolved } }));
+  }
+
+  function getStoredTheme() {
+    return (
+      localStorage.getItem('theme') ||
+      localStorage.getItem('pcTheme') ||
+      localStorage.getItem('userTheme')
+    );
   }
 
   function initTheme() {
-    const saved = localStorage.getItem('pcTheme');
-    if (saved) applyTheme(saved);
+    const fromStorage = getStoredTheme();
+    if (fromStorage) {
+      applyTheme(fromStorage);
+      return;
+    }
+
+    // Fall back to server-rendered attribute if available.
+    const serverTheme = document.documentElement.getAttribute('data-theme');
+    if (serverTheme === 'dark' || serverTheme === 'light') {
+      applyTheme(serverTheme);
+      return;
+    }
+
+    applyTheme('light');
   }
 
   function bindDeleteButtons() {
@@ -157,4 +182,18 @@
   document.addEventListener('DOMContentLoaded', function () {
     window.PCUI.init();
   });
+
+  // Keep auto-theme users in sync with system appearance changes.
+  if (window.matchMedia) {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const listener = function () {
+      const saved = getStoredTheme();
+      if (saved === 'auto') applyTheme('auto');
+    };
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', listener);
+    } else if (typeof media.addListener === 'function') {
+      media.addListener(listener);
+    }
+  }
 })();

@@ -6,6 +6,20 @@
 ?>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  (function() {
+    try {
+      var savedTheme = localStorage.getItem('theme') || localStorage.getItem('pcTheme') || localStorage.getItem('userTheme');
+      if (!savedTheme) return;
+      var resolved = savedTheme === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : savedTheme;
+      var html = document.documentElement;
+      html.setAttribute('data-theme', resolved);
+      html.classList.toggle('dark', resolved === 'dark');
+    } catch (e) {}
+  })();
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {

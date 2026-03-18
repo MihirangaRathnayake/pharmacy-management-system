@@ -137,6 +137,10 @@ $profileImage = ($user && !empty($user['profile_image']))
       window.PCUI.showToast('Theme switched to ' + next, 'info');
     } else {
       document.documentElement.setAttribute('data-theme', next);
+      document.documentElement.classList.toggle('dark', next === 'dark');
+      localStorage.setItem('pcTheme', next);
+      localStorage.setItem('theme', next);
+      localStorage.setItem('userTheme', next);
     }
   }
 

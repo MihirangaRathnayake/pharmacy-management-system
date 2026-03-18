@@ -74,7 +74,7 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<?php echo getThemeClass(); ?>">
 
 <head>
     <title>Pharmacy Management System - Dashboard</title>
@@ -514,6 +514,105 @@ try {
             align-items: center;
             gap: 0.25rem;
             margin-top: 0.5rem;
+        }
+
+        /* Dashboard-specific dark mode overrides.
+           Needed because this page has late inline light-mode !important rules. */
+        html[data-theme="dark"] body.pc-shell {
+            background: #0b1220 !important;
+        }
+
+        html[data-theme="dark"] .dashboard-animated-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #111827 45%, #1e293b 100%) !important;
+        }
+
+        html[data-theme="dark"] .particle {
+            background: rgba(56, 189, 248, 0.06) !important;
+        }
+
+        html[data-theme="dark"] nav {
+            background: rgba(15, 23, 42, 0.92) !important;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.8) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.35) !important;
+        }
+
+        html[data-theme="dark"] nav .pc-btn {
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="dark"] nav .pc-btn i {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn,
+        html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn span {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn.ring-2,
+        html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn.ring-2 span {
+            color: #34d399 !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+        }
+
+        html[data-theme="dark"] nav .pc-card {
+            background: rgba(15, 23, 42, 0.98) !important;
+            border: 1px solid rgba(71, 85, 105, 0.65) !important;
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45) !important;
+        }
+
+        html[data-theme="dark"] nav .flex.items-center.gap-2>button {
+            background: rgba(15, 23, 42, 0.72) !important;
+            border-color: rgba(71, 85, 105, 0.85) !important;
+        }
+
+        html[data-theme="dark"] nav .relative:last-child button,
+        html[data-theme="dark"] nav .relative:last-child button *,
+        html[data-theme="dark"] nav .font-bold.leading-tight,
+        html[data-theme="dark"] nav .text-xs.text-slate-500,
+        html[data-theme="dark"] #userDropdown a,
+        html[data-theme="dark"] #notificationsDropdown .text-sm,
+        html[data-theme="dark"] #notificationsDropdown .font-semibold,
+        html[data-theme="dark"] #notificationsList div,
+        html[data-theme="dark"] #notificationsList span,
+        html[data-theme="dark"] #notificationsList p,
+        html[data-theme="dark"] #notificationsList .font-medium {
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="dark"] #notificationsList>div {
+            background: rgba(30, 41, 59, 0.75) !important;
+            border-color: rgba(71, 85, 105, 0.8) !important;
+        }
+
+        html[data-theme="dark"] #notificationsList>div:hover,
+        html[data-theme="dark"] #userDropdown a:hover {
+            background: rgba(51, 65, 85, 0.6) !important;
+        }
+
+        html[data-theme="dark"] .pc-page-header,
+        html[data-theme="dark"] .pc-card,
+        html[data-theme="dark"] .pc-stat-card {
+            background: rgba(15, 23, 42, 0.82) !important;
+            border-color: rgba(51, 65, 85, 0.85) !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32) !important;
+        }
+
+        html[data-theme="dark"] .pc-breadcrumb {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] .text-gray-900,
+        html[data-theme="dark"] .text-gray-800,
+        html[data-theme="dark"] .text-gray-700 {
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="dark"] .text-gray-600,
+        html[data-theme="dark"] .text-gray-500,
+        html[data-theme="dark"] .text-slate-500,
+        html[data-theme="dark"] .text-slate-400 {
+            color: #94a3b8 !important;
         }
     </style>
 </head>

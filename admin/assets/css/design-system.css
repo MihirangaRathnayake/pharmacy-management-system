@@ -722,3 +722,263 @@ nav .relative .pc-card div:hover {
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
   }
 }
+
+/* ========== Dark Mode Overrides (Global) ========== */
+html[data-theme="dark"] body {
+  background: #0b1220 !important;
+  color: var(--pc-text) !important;
+}
+
+html[data-theme="dark"] body::before {
+  background: linear-gradient(135deg, #0f172a 0%, #111827 45%, #1e293b 100%) !important;
+}
+
+html[data-theme="dark"] .dashboard-animated-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #111827 45%, #1e293b 100%) !important;
+}
+
+html[data-theme="dark"] .particle {
+  background: rgba(56, 189, 248, 0.06) !important;
+}
+
+html[data-theme="dark"] nav {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.8) !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] nav .pc-btn {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] nav .pc-btn i {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] nav .pc-btn:hover {
+  background: rgba(51, 65, 85, 0.45) !important;
+}
+
+html[data-theme="dark"] nav .pc-btn:hover i {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn,
+html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn span {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn.ring-2,
+html[data-theme="dark"] nav .md\:flex.items-center.gap-2 a.pc-btn.ring-2 span {
+  color: #34d399 !important;
+  background: rgba(16, 185, 129, 0.2) !important;
+}
+
+html[data-theme="dark"] nav .pc-card {
+  background: rgba(15, 23, 42, 0.98) !important;
+  border: 1px solid rgba(71, 85, 105, 0.65) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45) !important;
+}
+
+html[data-theme="dark"] nav .flex.items-center.gap-2 > button {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: rgba(71, 85, 105, 0.85) !important;
+}
+
+html[data-theme="dark"] nav .flex.items-center.gap-2 > button:hover,
+html[data-theme="dark"] nav .relative > button:hover {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(100, 116, 139, 0.95) !important;
+}
+
+html[data-theme="dark"] nav .relative:last-child button,
+html[data-theme="dark"] nav .relative:last-child button *,
+html[data-theme="dark"] nav .font-bold.leading-tight,
+html[data-theme="dark"] nav .text-xs.text-slate-500,
+html[data-theme="dark"] #userDropdown a {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] #userDropdown a:hover,
+html[data-theme="dark"] nav .relative .pc-card a:hover,
+html[data-theme="dark"] nav .relative .pc-card div:hover {
+  background: rgba(51, 65, 85, 0.45) !important;
+}
+
+html[data-theme="dark"] #notificationsDropdown .text-sm,
+html[data-theme="dark"] #notificationsDropdown .font-semibold,
+html[data-theme="dark"] #notificationsList div,
+html[data-theme="dark"] #notificationsList span,
+html[data-theme="dark"] #notificationsList p,
+html[data-theme="dark"] #notificationsList .font-medium {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] #notificationsList > div {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(71, 85, 105, 0.8) !important;
+}
+
+html[data-theme="dark"] #notificationsList > div:hover {
+  background: rgba(51, 65, 85, 0.75) !important;
+  border-color: rgba(100, 116, 139, 0.9) !important;
+}
+
+html[data-theme="dark"] .pc-page-header,
+html[data-theme="dark"] .pc-card,
+html[data-theme="dark"] .pc-stat-card {
+  background: rgba(15, 23, 42, 0.82) !important;
+  border-color: rgba(51, 65, 85, 0.85) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32) !important;
+}
+
+html[data-theme="dark"] .pc-toolbar,
+html[data-theme="dark"] .pc-table-wrap,
+html[data-theme="dark"] .pc-empty-state,
+html[data-theme="dark"] .pc-chart-card {
+  background: var(--pc-surface) !important;
+  border-color: var(--pc-border) !important;
+}
+
+html[data-theme="dark"] .bg-white {
+  background-color: var(--pc-surface) !important;
+}
+
+html[data-theme="dark"] .bg-gray-50,
+html[data-theme="dark"] .bg-gray-100 {
+  background-color: var(--pc-surface-2) !important;
+}
+
+html[data-theme="dark"] .border-gray-100,
+html[data-theme="dark"] .border-gray-200,
+html[data-theme="dark"] .border-gray-300 {
+  border-color: var(--pc-border) !important;
+}
+
+html[data-theme="dark"] .text-gray-900,
+html[data-theme="dark"] .text-gray-800,
+html[data-theme="dark"] .text-gray-700,
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .text-gray-600,
+html[data-theme="dark"] .text-gray-500,
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .pc-input,
+html[data-theme="dark"] .pc-select,
+html[data-theme="dark"] .pc-textarea,
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background: var(--pc-surface-2) !important;
+  color: #e2e8f0 !important;
+  border-color: var(--pc-border) !important;
+}
+
+/* Common module-specific classes used across pages with inline CSS */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .info-card,
+html[data-theme="dark"] .form-section {
+  background: var(--pc-surface) !important;
+  border: 1px solid var(--pc-border) !important;
+  box-shadow: var(--pc-shadow-soft) !important;
+}
+
+html[data-theme="dark"] .section-content {
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .section-header {
+  border-bottom-color: var(--pc-border) !important;
+}
+
+html[data-theme="dark"] .form-label {
+  color: #cbd5e1 !important;
+  background: var(--pc-surface) !important;
+}
+
+html[data-theme="dark"] .form-input,
+html[data-theme="dark"] .form-textarea {
+  background: var(--pc-surface-2) !important;
+  border-color: var(--pc-border) !important;
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .form-input:focus,
+html[data-theme="dark"] .form-textarea:focus {
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .icon-input i {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .help-text {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .btn-secondary {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: var(--pc-border) !important;
+}
+
+html[data-theme="dark"] .btn-secondary:hover {
+  background: #334155 !important;
+}
+
+html[data-theme="dark"] .glass-card {
+  background: rgba(15, 23, 42, 0.88) !important;
+  border-color: var(--pc-border) !important;
+}
+
+/* Tailwind utility-style color classes commonly used in module templates */
+html[data-theme="dark"] .bg-gray-50,
+html[data-theme="dark"] .bg-gray-100,
+html[data-theme="dark"] .bg-slate-50,
+html[data-theme="dark"] .bg-slate-100 {
+  background-color: var(--pc-surface-2) !important;
+}
+
+html[data-theme="dark"] .bg-green-50,
+html[data-theme="dark"] .bg-blue-50,
+html[data-theme="dark"] .bg-purple-50,
+html[data-theme="dark"] .bg-red-50,
+html[data-theme="dark"] .bg-yellow-50,
+html[data-theme="dark"] .bg-indigo-50,
+html[data-theme="dark"] .bg-pink-50 {
+  background-color: rgba(51, 65, 85, 0.55) !important;
+}
+
+html[data-theme="dark"] .bg-green-100,
+html[data-theme="dark"] .bg-blue-100,
+html[data-theme="dark"] .bg-purple-100,
+html[data-theme="dark"] .bg-red-100,
+html[data-theme="dark"] .bg-yellow-100,
+html[data-theme="dark"] .bg-indigo-100,
+html[data-theme="dark"] .bg-pink-100 {
+  background-color: rgba(71, 85, 105, 0.75) !important;
+}
+
+html[data-theme="dark"] .border-green-100,
+html[data-theme="dark"] .border-green-200,
+html[data-theme="dark"] .border-red-200,
+html[data-theme="dark"] .border-blue-200,
+html[data-theme="dark"] .border-yellow-200,
+html[data-theme="dark"] .border-indigo-200,
+html[data-theme="dark"] .border-purple-200,
+html[data-theme="dark"] .border-pink-200 {
+  border-color: var(--pc-border) !important;
+}
+
+/* Ensure auth pages with inline body background follow dark mode */
+html[data-theme="dark"] body[style*="background: #fafafa"] {
+  background: #0b1220 !important;
+}
